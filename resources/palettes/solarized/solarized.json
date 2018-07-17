@@ -1,0 +1,95 @@
+{
+    "palette" : {
+        "name" : "Solarized",
+        "comment" : [
+            "Solarized color scheme",
+            "",
+            "Canonical Project Page:",
+            "http://ethanschoonover.com/solarized",
+            "",
+            "Full Git Repository:",
+            "https://github.com/altercation/solarized"
+        ],
+        "colors" : [{
+            "name"    : "Base 03",
+            "keyword" : "base03",
+            "value"   : "#002b36",
+            "comment" : "Background tone"
+        }, {
+            "name"    : "Base 02",
+            "keyword" : "base02",
+            "value"   : "#073642",
+            "comment" : "Background tone"
+        }, {
+            "name"    : "Base 01",
+            "keyword" : "base01",
+            "value"   : "#586e75",
+            "comment" : "Content tone"
+        }, {
+            "name"    : "Base 00",
+            "keyword" : "base00",
+            "value"   : "#657b83",
+            "comment" : "Content tone"
+        }, {
+            "name"    : "Base 0",
+            "keyword" : "base0",
+            "value"   : "#839496",
+            "comment" : "Content tone"
+        }, {
+            "name"    : "Base 1",
+            "keyword" : "base1",
+            "value"   : "#93a1a1",
+            "comment" : "Content tone"
+        }, {
+            "name"    : "Base 2",
+            "keyword" : "base2",
+            "value"   : "#eee8d5",
+            "comment" : "Background tone"
+        }, {
+            "name"    : "Base 3",
+            "keyword" : "base3",
+            "value"   : "#fdf6e3",
+            "comment" : "Background tone"
+        }, {
+            "name"    : "Yellow",
+            "keyword" : "yellow",
+            "value"   : "#b58900",
+            "comment" : "Split complementary accent color"
+        }, {
+            "name"    : "Orange",
+            "keyword" : "orange",
+            "value"   : "#cb4b16",
+            "comment" : "Complementary accent color"
+        }, {
+            "name"    : "Red",
+            "keyword" : "red",
+            "value"   : "#dc322f",
+            "comment" : "Triadic accent color"
+        }, {
+            "name"    : "Magenta",
+            "keyword" : "magenta",
+            "value"   : "#d33682",
+            "comment" : "Tetradic accent color"
+        }, {
+            "name"    : "Violet",
+            "keyword" : "violet",
+            "value"   : "#6c71c4",
+            "comment" : "Analogous accent color"
+        }, {
+            "name"    : "Blue",
+            "keyword" : "blue",
+            "value"   : "#268bd2",
+            "comment" : "Monotone accent color"
+        }, {
+            "name"    : "Cyan",
+            "keyword" : "cyan",
+            "value"   : "#2aa198",
+            "comment" : "Analogous accent color"
+        }, {
+            "name"    : "Green",
+            "keyword" : "green",
+            "value"   : "#859900",
+            "comment" : "Tetradic accent color"
+        }]
+    }
+}
