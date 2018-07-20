@@ -53,7 +53,8 @@ Ideally some of the featues of this software will include things such as:
 
 ### Dependencies
 
-- [ImageMagick](http://www.imagemagick.org)
+- ImageMagick ([project page](http://www.imagemagick.org),
+  [GitHub page](https://github.com/ImageMagick))
 
 ### Building and testing
 
