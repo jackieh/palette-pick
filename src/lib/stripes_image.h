@@ -18,11 +18,9 @@ namespace palette {
         public:
             enum OValue { VERTICAL, HORIZONTAL, UNKNOWN };
 
-            Orientation();
-            Orientation(std::string &orientation_str);
             Orientation(OValue orientation_val);
+            Orientation(const std::string &orientation_str);
             OValue get() const;
-            bool is_valid() const;
             std::string to_string() const;
 
         private:
@@ -33,21 +31,20 @@ namespace palette {
         StripesImage();
 
         void insert_color(Magick::Color color);
+        void set_length(int stripe_length);
+        void set_width(int stripe_width);
         void set_orientation(Orientation stripe_orientation);
-        void set_length(size_t stripe_length);
-        void set_width(size_t stripe_width);
 
         bool empty() const;
-        ExportStatus export_image(std::string const file_name,
+        size_t size() const;
+        ExportStatus export_image(const std::string file_name,
                                   std::stringstream &export_stream,
                                   std::stringstream &error_stream);
 
     private:
+        int stripe_width_;
+        int stripe_length_;
         Orientation stripe_orientation_;
-        bool default_stripe_length_;
-        size_t stripe_length_;
-        size_t stripe_width_;
-        std::string file_name_;
         ColorCollection stripe_colors_;
     };
 }

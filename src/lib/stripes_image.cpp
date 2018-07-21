@@ -9,27 +9,11 @@
 
 namespace palette {
 
-    StripesImage::Orientation::Orientation() {
-        orientation_ = Orientation::OValue::VERTICAL;
-        repr_ = "vertical";
-    }
-
-    StripesImage::Orientation::Orientation(std::string &orientation_str) {
-        // Store the input string so we can display it later if it's invalid.
-        repr_ = std::string(orientation_str);
-        if (orientation_str.compare("vertical") == 0) {
-            orientation_ = Orientation::OValue::VERTICAL;
-        } else if (orientation_str.compare("horizontal") == 0) {
-            orientation_ = Orientation::OValue::HORIZONTAL;
-        } else {
-            orientation_ = Orientation::OValue::UNKNOWN;
-        }
-    }
-
     StripesImage::Orientation::Orientation(StripesImage::Orientation::OValue
-                                           orientation_val)
+                                           orientation_val) :
+        orientation_(orientation_val),
+        repr_(std::string())
     {
-        orientation_ = orientation_val;
         switch (orientation_val) {
             case Orientation::OValue::VERTICAL: repr_ = "vertical"; break;
             case Orientation::OValue::HORIZONTAL: repr_ = "horizontal"; break;
@@ -37,38 +21,43 @@ namespace palette {
         }
     }
 
-    StripesImage::Orientation::OValue StripesImage::Orientation::get() const {
-        return orientation_;
+    StripesImage::Orientation::Orientation(const std::string &orientation_str) :
+        orientation_(Orientation::OValue::UNKNOWN),
+        // Store the input string so we can display it later if it's invalid.
+        repr_(std::string(orientation_str))
+    {
+        if (orientation_str.compare("vertical") == 0) {
+            orientation_ = Orientation::OValue::VERTICAL;
+        } else if (orientation_str.compare("horizontal") == 0) {
+            orientation_ = Orientation::OValue::HORIZONTAL;
+        }
     }
 
-    bool StripesImage::Orientation::is_valid() const {
-        switch (orientation_) {
-            case Orientation::OValue::VERTICAL: return true;
-            case Orientation::OValue::HORIZONTAL: return true;
-            default: return false;
-        }
+    StripesImage::Orientation::OValue StripesImage::Orientation::get() const {
+        return orientation_;
     }
 
     std::string StripesImage::Orientation::to_string() const {
         return repr_;
     }
 
-    StripesImage::StripesImage() {
-        stripe_orientation_ = Orientation(Orientation::OValue::VERTICAL);
-        stripe_length_ = 0;
-        stripe_width_ = 100;
-        default_stripe_length_ = true;
-    }
+    StripesImage::StripesImage() :
+        stripe_width_(0),
+        stripe_length_(0),
+        stripe_orientation_(StripesImage::Orientation::UNKNOWN),
+        stripe_colors_(ColorCollection())
+    { }
 
     void StripesImage::insert_color(Magick::Color color) {
-        size_t prev_size = stripe_colors_.size();
         stripe_colors_.insert(color);
-        size_t curr_size = stripe_colors_.size();
-        if (prev_size != curr_size) {
-            if (default_stripe_length_) {
-                stripe_length_ = stripe_width_ * curr_size;
-            }
-        }
+    }
+
+    void StripesImage::set_length(int stripe_length) {
+        stripe_length_ = stripe_length;
+    }
+
+    void StripesImage::set_width(int stripe_width) {
+        stripe_width_ = stripe_width;
     }
 
     void StripesImage::set_orientation(StripesImage::Orientation
@@ -77,27 +66,33 @@ namespace palette {
         stripe_orientation_ = stripe_orientation;
     }
 
-    void StripesImage::set_length(size_t stripe_length) {
-        default_stripe_length_ = false;
-        stripe_length_ = stripe_length;
-    }
-
-    void StripesImage::set_width(size_t stripe_width) {
-        stripe_width_ = stripe_width;
-        if (default_stripe_length_) {
-            stripe_length_ = stripe_width_ * stripe_colors_.size();
-        }
-    }
-
     bool StripesImage::empty() const {
         return (stripe_colors_.size() == 0);
     }
 
+    size_t StripesImage::size() const {
+        return stripe_colors_.size();
+    }
+
     StripesImage::ExportStatus StripesImage::export_image(
-        std::string const file_name,
+        const std::string file_name,
         std::stringstream &export_stream,
         std::stringstream &error_stream)
     {
+        if (stripe_length_ <= 0) {
+            error_stream << "Image was configured with stripe length "
+                << stripe_length_ << " which is not a positive integer; "
+                << "it must be a positive integer" << std::endl;
+            return ExportStatus::FAIL;
+        }
+
+        if (stripe_width_ <= 0) {
+            error_stream << "Image was configured with stripe width "
+                << stripe_width_ << " which is not a positive integer; "
+                << "it must be a positive integer" << std::endl;
+            return ExportStatus::FAIL;
+        }
+
         int image_width;
         int image_height;
         switch (stripe_orientation_.get()) {
@@ -113,30 +108,29 @@ namespace palette {
                 error_stream << "\"" << stripe_orientation_.to_string()
                     << "\" is not a valid orientation; it must be either "
                     << "\"vertical\" or \"horizontal\"" << std::endl;
-                    return ExportStatus::FAIL;
+                return ExportStatus::FAIL;
         }
 
-        // Initialize image as a fully transparent white canvas.
-        Magick::Geometry const canvas_size(image_width, image_height);
-        Magick::Color const canvas_color(/* red */ 0xff, /* green */ 0xff,
-                                         /* blue */ 0xff, /* alpha */ 0xff);
+        // Initialize image as a canvas with the first color in the collection
+        // of stripe colors.
+        const Magick::Geometry canvas_size(image_width, image_height);
+        const Magick::Color canvas_color(*stripe_colors_.cbegin());
         Magick::Image stripes(canvas_size, canvas_color);
 
         int stripe_idx = 0;
-        for (auto const &stripe_color : stripe_colors_) {
+        for (const auto &stripe_color : stripe_colors_) {
             stripes.fillColor(stripe_color);
             int stripe_width_begin = stripe_idx * stripe_width_;
-            int stripe_width_end = ((stripe_idx + 1) * stripe_width_) - 1;
             switch (stripe_orientation_.get()) {
                 case Orientation::OValue::VERTICAL:
                     stripes.draw(Magick::DrawableRectangle(
                             stripe_width_begin, 0,
-                            stripe_width_end, stripe_length_));
+                            image_width, image_height));
                     break;
                 case Orientation::OValue::HORIZONTAL:
                     stripes.draw(Magick::DrawableRectangle(
                             0, stripe_width_begin,
-                            stripe_length_, stripe_width_end));
+                            image_width, image_height));
                     break;
                 default:
                     // This variable should have already been checked for
@@ -149,7 +143,8 @@ namespace palette {
         try {
             stripes.write(file_name);
         } catch (Magick::Exception &error) {
-            error_stream << error.what() << std::endl;
+            error_stream << "ImageMagick exception: "
+                << error.what() << std::endl;
             return ExportStatus::FAIL;
         }
         export_stream << "Wrote " << std::dec <<
@@ -158,4 +153,4 @@ namespace palette {
             << stripe_colors_.to_string(", ") << std::endl;
         return ExportStatus::SUCCESS;
     }
-}
+} // namespace palette

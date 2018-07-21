@@ -9,13 +9,19 @@
 
 namespace palette {
 
-    ColorCollection::ColorCollection() { }
+    ColorCollection::ColorCollection() :
+        colors_(std::set<Magick::Color>())
+    { }
 
-    ColorCollection::ColorCollection(std::vector<Magick::Color> colors) {
+    ColorCollection::ColorCollection(std::vector<Magick::Color> colors) :
+        colors_(std::set<Magick::Color>())
+    {
         colors_.insert(colors.begin(), colors.end());
     }
 
-    ColorCollection::ColorCollection(ColorCollection &colors) {
+    ColorCollection::ColorCollection(ColorCollection &colors) :
+        colors_(std::set<Magick::Color>())
+    {
         colors_.insert(colors.begin(), colors.end());
     }
 
@@ -51,7 +57,7 @@ namespace palette {
         std::stringstream hex_stringstream;
         hex_stringstream << std::setfill('0') << std::hex << std::uppercase;
         bool first_elem = true;
-        for (auto const &color : colors_) {
+        for (const auto &color : colors_) {
             if (first_elem) {
                 first_elem = false;
             } else {

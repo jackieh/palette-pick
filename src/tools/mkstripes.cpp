@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <iostream>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -7,152 +8,272 @@
 #include <boost/program_options.hpp>
 #include <Magick++.h>
 
+#include <tools_common.h>
 #include <stripes_image.h>
 
-int main(int argc, char **argv) {
-    boost::program_options::options_description opt_descr("Arguments");
-    opt_descr.add_options()
-        // TODO: Either implement an --input/-I option or create another tool
-        //       to read color values from a text file.
-        //       Example: mkstripes -I ~/.vim/colors/solarized.vim \
-        //                -O solarized.png
-        // TODO: Create a way to input color values via stdin.
-        //       Example: getcolors -n 8 ~/Pictures/wallpaper.png | mkstripes \
-        //                -O bgcolors.png
-        // TODO: Create an --annotate/-a option to annotate stripes with their
-        //       hex values.
-        // TODO: Consider creating an --unique/-U option that lets the user opt
-        //       in/out of removal of duplicate colors.
-        ("help,h", "Print this help message and exit")
-        ("verbose,v", "Print extra information to stdout")
-        ("width,w", boost::program_options::value<int>(),
-         "Specify width in pixels of stripes in generated image (default 100)")
-        ("length,l", boost::program_options::value<int>(),
-         "Specify length in pixels of stripes in generated image (default 100 "
-         "multiplied by number of colors)")
-        ("orientation,o", boost::program_options::value<std::string>(),
-         "Specify orientation of stripes as either \"vertical\" or "
-         "\"horizontal\" (default vertical)")
-        ("color,c", boost::program_options::value<std::vector<std::string>>(),
-         "Specify an additional stripe by its color")
-        ("output,O", boost::program_options::value<std::string>(),
-         "Output image file")
-    ;
+namespace {
+    namespace bpo = boost::program_options;
 
-    boost::program_options::positional_options_description pos_opt_descr;
-    pos_opt_descr.add("output", 1);
+    class MkStripes : public Tool {
+    public:
+        static const size_t default_width = 100;
+        static const size_t default_length_multiplier = 100;
+        static constexpr const char *default_orientation = "vertical";
 
-    std::stringstream usage_stream;
-    usage_stream << "Usage: " << EXEC_NAME << " [arguments] [output]"
-        << std::endl;
-    usage_stream << "Create image file with stripes of specified colors."
-        << std::endl;
-    usage_stream << std::endl;
-    usage_stream << "If generating an image, then specifying at least one "
-        << "color is required." << std::endl
-        << "Width/length/orientation arguments are optional." << std::endl;
+        MkStripes() :
+            help_(false),
+            verbose_(false),
+            width_(std::nullopt),
+            length_(std::nullopt),
+            orientation_(std::nullopt),
+            output_file_(std::nullopt),
+            colors_(std::vector<std::string>()),
+            options_string_(std::string())
+        { }
 
-    std::stringstream example_stream;
-    example_stream << "Examples: " << EXEC_NAME
-        << " -c red -c orange -c yellow -o vertical output.png" << std::endl;
-    example_stream << "      or: " << EXEC_NAME
-        << " -c cyan -c \"#ffffff\" -c \"#FF0000\" -l 500 -w 500 output.gif"
-        << std::endl;
-
-    boost::program_options::variables_map var_map;
-    boost::program_options::command_line_parser parser(argc, argv);
-    try {
-        boost::program_options::store(
-            parser.options(opt_descr).positional(pos_opt_descr).run(), var_map);
-        boost::program_options::notify(var_map);
-    } catch (boost::program_options::too_many_positional_options_error &error) {
-        std::cerr << "Error: more than one output file specified" << std::endl;
-        return 1;
-    } catch (boost::program_options::multiple_occurrences &error) {
-        // Option X cannot be specified more than once.
-        std::cerr << "Error: " << error.what() << std::endl;
-    } catch (boost::program_options::unknown_option &error) {
-        std::cerr << "Error: " << error.what() << std::endl;
-        return 1;
-    } catch (boost::program_options::invalid_command_line_syntax &error) {
-        std::cerr << "Error: failed to interpret an argument after the "
-            << error.tokens() << " option; if the color value has a '#' "
-            << "character then you must either place the color value in "
-            << "quotes or prefix the '#' character with a '\\' character"
-            << std::endl;
-        return 1;
-    }
-
-    // Do the following in order:
-    // 1. Check for help; exit if specified.
-    // 2. Check for output; exit if not specified.
-    // 3. Check for colors; exit if no colors are successfully gathered.
-    // 4. Gather other options.
-    // 5. Try to export the image.
-
-    if (var_map.count("help")) {
-        std::cerr << usage_stream.str() << std::endl;
-        std::cerr << example_stream.str() << std::endl;
-        std::cerr << opt_descr << std::endl;
-        return 1;
-    }
-
-    if (!var_map.count("output")) {
-        std::cerr << "No output file specified" << std::endl;
-        return 1;
-    }
-    std::string const output_file(var_map["output"].as<std::string>());
-
-    Magick::InitializeMagick(*argv);
-    palette::StripesImage image;
-
-    // Gather colors from command line options.
-    if (var_map.count("color")) {
-        auto color_opts = var_map["color"].as< std::vector<std::string> >();
-        for (auto const &color_str : color_opts) {
+        // Parse command line input into private members of this MkStripes
+        // object. Return 0 if successful, or return a nonzero int if a fatal
+        // error is encountered.
+        int parse_options(int argc, char **argv) {
             try {
-                Magick::Color color_obj(color_str);
-                image.insert_color(color_obj);
-            } catch (Magick::Exception &error) {
-                std::cerr << "Warning: color option \"" << color_str
-                    << "\" could not be interpreted as a color; ignoring"
+                try_parse_options(argc, argv);
+            } catch (bpo::too_many_positional_options_error &error) {
+                std::cerr << "Error: more than one output file specified"
                     << std::endl;
-            }
-        }
-    }
-    if (image.empty()) {
-        std::cerr << "No colors have been gathered; colors are required in "
-            << "order to generate an image" << std::endl;
-        return 1;
-    }
-
-    // Gather other command line options.
-    if (var_map.count("width")) {
-        image.set_width(var_map["width"].as<int>());
-    }
-    if (var_map.count("length")) {
-        image.set_length(var_map["length"].as<int>());
-    }
-    if (var_map.count("orientation")) {
-        std::string orientation_str = var_map["orientation"].as<std::string>();
-        image.set_orientation(orientation_str);
-    }
-
-    std::stringstream export_stream;
-    std::stringstream error_stream;
-    palette::StripesImage::ExportStatus export_status =
-        image.export_image(output_file, export_stream, error_stream);
-    switch (export_status) {
-        case palette::StripesImage::SUCCESS:
-            if (var_map.count("verbose")) {
-                std::cout << export_stream.str();
+                return exit_more_information();
+            } catch (bpo::multiple_occurrences &error) {
+                // Option X cannot be specified more than once.
+                std::cerr << "Error: " << error.what() << std::endl;
+                return exit_more_information();
+            } catch (bpo::unknown_option &error) {
+                // Unrecognized option X.
+                std::cerr << "Error: unrecognized option \""
+                    << error.get_option_name() << "\"" << std::endl;
+                return exit_more_information();
+            } catch (bpo::invalid_command_line_syntax &error) {
+                std::cerr << "Error: failed to interpret an argument after the "
+                    << error.tokens() << " option; "
+                    << "if the color value has a '#' character "
+                    << "then you must either place the color value in quotes "
+                    << "or prefix the '#' character with a '\\' character"
+                    << std::endl;
+                return exit_more_information();
             }
             return 0;
-        case palette::StripesImage::FAIL:
-            std::cerr << "Error: " << error_stream.str();
-            return 1;
-    }
+        }
 
-    // If the control flow ends up here then the code is incorrect.
-    assert(0);
+        // Gather any stdin text, each line of which is always interpreted as a
+        // color.
+        void parse_stdin() {
+            std::string line;
+            while (std::getline(std::cin, line)) {
+                colors_.push_back(line);
+            }
+        }
+
+        // Evaluate the collected command line options and export an image.
+        // Return 0 if successful, or return a nonzero int if a fatal error is
+        // encountered.
+        //
+        // Check for help, check for output file, then create an image and set
+        // stripe colors/width/length/orientation and export the image to the
+        // output file.
+        int run() {
+            if (help_) {
+                return exit_help();
+            }
+            if (!output_file_.has_value()) {
+                std::cerr << "Error: No output file specified" << std::endl;
+                return exit_more_information();
+            }
+            palette::StripesImage image;
+
+            // Set colors.
+            for (const auto &color_str : colors_) {
+                try {
+                    Magick::Color color_obj(color_str);
+                    image.insert_color(color_obj);
+                } catch (Magick::Exception &error) {
+                    std::cerr << "Warning: color option \"" << color_str
+                        << "\" could not be interpreted as a color; ignoring"
+                        << std::endl;
+                }
+            }
+            if (image.empty()) {
+                std::cerr << "No colors have been gathered; "
+                    << "colors are required in order to generate an image"
+                    << std::endl;
+                return exit_more_information();
+            }
+            size_t number_of_stripes = image.size();
+
+            image.set_width(width_.value_or((int)default_width));
+            image.set_length(length_.value_or(number_of_stripes
+                                              * default_length_multiplier));
+            image.set_orientation(orientation_.value_or(default_orientation));
+
+            // Export the image.
+            std::stringstream verbose_stream;
+            std::stringstream error_stream;
+            palette::StripesImage::ExportStatus export_status =
+                image.export_image(output_file_.value(),
+                                   verbose_stream, error_stream);
+            switch (export_status) {
+                case palette::StripesImage::SUCCESS:
+                    if (verbose_) {
+                        std::cout << verbose_stream.str();
+                    }
+                    return 0;
+                case palette::StripesImage::FAIL:
+                    std::cerr << "Error: " << error_stream.str();
+                    return exit_more_information();
+            }
+
+            // If the control flow ends up here then the code is incorrect.
+            assert(0);
+        }
+
+    private:
+        // Return the name of the executable file.
+        std::string exec_name() { return EXEC_NAME; }
+
+        // Return description of options constructed by a call to parse_options.
+        std::string options_string() { return options_string_; }
+
+        // Return summary of the functionality of this tool.
+        std::string usage_string() {
+            std::stringstream usage_stream;
+            usage_stream << "Usage: " << exec_name()
+                << " [arguments] [output]" << std::endl
+                << "Create image file with stripes of specified colors."
+                << std::endl << std::endl;
+            usage_stream << "If generating an image, "
+                << "then specifying at least one color is required."
+                << std::endl
+                << "Width/length/orientation arguments are optional."
+                << std::endl;
+            return usage_stream.str();
+        }
+
+        // Return description of specific examples of using this tool.
+        std::string examples_string() {
+            std::stringstream examples_stream;
+            examples_stream << "Examples: " << exec_name()
+                << " -c red -c orange -c yellow -o vertical output.png"
+                << std::endl;
+            examples_stream << "      or: " << exec_name()
+                << " -c cyan -c \"#ffffff\" -c \"#FF0000\" "
+                << "-l 500 -w 500 output.gif" << std::endl;
+            return examples_stream.str();
+        }
+
+        // Create names and a description for each command line option.
+        void create_options(bpo::options_description &opt,
+                            bpo::positional_options_description &pos_opt)
+        {
+            const char *help_chars = "Print this help message and exit";
+            const char *verbose_chars = "Print extra information to stdout";
+
+            std::stringstream width_stream;
+            width_stream << "Specify width in pixels of each stripe "
+                << "in generated image (default " << default_width << ")";
+            std::string width_string = width_stream.str();
+            const char *width_chars = width_string.c_str();
+            const auto *width_semantic(bpo::value<int>());
+
+            std::stringstream length_stream;
+            length_stream << "Specify length in pixels of stripes "
+                << "in generated image (default " << default_length_multiplier
+                << " multiplied by number of colors)";
+            std::string length_string = length_stream.str();
+            const char *length_chars = length_string.c_str();
+            const auto *length_semantic(bpo::value<int>());
+
+            std::stringstream orientation_stream;
+            orientation_stream << "Specify orientation of stripes "
+                << "as either \"vertical\" or \"horizontal\" (default "
+                << default_orientation << ")";
+            std::string orientation_string = orientation_stream.str();
+            const char *orientation_chars = orientation_string.c_str();
+            const auto *orientation_semantic(bpo::value<std::string>());
+
+            const char *color_chars =
+                "Specify an additional stripe by its color";
+            const auto *color_semantic(bpo::value<std::vector<std::string>>());
+
+            const char *output_chars = "Specify the path of output image file";
+            const auto *output_semantic(bpo::value<std::string>());
+
+            // TODO: Either implement an --input/-I option or create
+            //       another tool to read color values from a text file.
+            //       Example: mkstripes -I ~/.vim/colors/solarized.vim \
+            //                -O solarized.png
+            // TODO: Create a way to input color values via stdin.
+            //       Example: getcolors -n 8 ~/Pictures/wallpaper.png \
+            //                | mkstripes -O bgcolors.png
+            // TODO: Create an --annotate/-a option to annotate stripes
+            //       with their hex values.
+            // TODO: Consider creating an --unique/-U option that lets the
+            //       user opt in/out of removal of duplicate colors.
+            opt.add_options()
+                ("help,h", help_chars)
+                ("verbose,v", verbose_chars)
+                ("width,w", width_semantic, width_chars)
+                ("length,l", length_semantic, length_chars)
+                ("orientation,o", orientation_semantic, orientation_chars)
+                ("color,c", color_semantic, color_chars)
+                ("output,O", output_semantic, output_chars)
+            ;
+            pos_opt.add("output", 1);
+
+            std::stringstream options_stream;
+            options_stream << opt;
+            options_string_ = options_stream.str();
+        }
+
+        // Set private fields of this MkStripes object from the command line
+        // options.
+        void set_options(bpo::variables_map var_map) {
+            help_ |= !var_map["help"].empty();
+            verbose_ |= !var_map["verbose"].empty();
+            if (!var_map["width"].empty()) {
+                width_ = std::optional<int>(var_map["width"].as<int>());
+            }
+            if (!var_map["length"].empty()) {
+                length_ = std::optional<int>(var_map["length"].as<int>());
+            }
+            if (!var_map["orientation"].empty()) {
+                orientation_ = std::optional<std::string>(
+                    var_map["orientation"].as<std::string>());
+            }
+            if (!var_map["output"].empty()) {
+                output_file_ = std::optional<std::string>(
+                    var_map["output"].as<std::string>());
+            }
+            if (!var_map["color"].empty()) {
+                auto color_opts =
+                    var_map["color"].as< std::vector<std::string> >();
+                colors_.insert(
+                    colors_.end(), color_opts.begin(), color_opts.end());
+            }
+        }
+
+        bool help_;
+        bool verbose_;
+        std::optional<int> width_;
+        std::optional<int> length_;
+        std::optional<std::string> orientation_;
+        std::optional<std::string> output_file_;
+        std::vector<std::string> colors_;
+        std::string options_string_;
+    };
+} // Unnamed namespace
+
+int main(int argc, char **argv) {
+    Magick::InitializeMagick(*argv);
+    MkStripes mkstripes_state;
+    mkstripes_state.parse_stdin();
+    int parse_options_result = mkstripes_state.parse_options(argc, argv);
+    return ((parse_options_result == 0)
+            ? mkstripes_state.run() : parse_options_result);
 }
