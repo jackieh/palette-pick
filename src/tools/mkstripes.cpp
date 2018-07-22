@@ -208,9 +208,6 @@ namespace {
             //       another tool to read color values from a text file.
             //       Example: mkstripes -I ~/.vim/colors/solarized.vim \
             //                -O solarized.png
-            // TODO: Create a way to input color values via stdin.
-            //       Example: getcolors -n 8 ~/Pictures/wallpaper.png \
-            //                | mkstripes -O bgcolors.png
             // TODO: Create an --annotate/-a option to annotate stripes
             //       with their hex values.
             // TODO: Consider creating an --unique/-U option that lets the
