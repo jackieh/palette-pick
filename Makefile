@@ -30,6 +30,7 @@ cleanobj:
 .PHONY: clean
 clean:
 	$(RM_OBJ_CMD)
+	rm -rf $(BUILD_DIR)/images/*
 	rm -f $(BUILD_DIR)/*
 
 
@@ -49,6 +50,7 @@ LIB_SRC = $(LIB_OBJ:.o=.cpp)
 $(LIB_DIR)/%.o: BUILD_FLAGS := -I$(LIB_DIR) $(MAGICK_FLAGS)
 LIB_OUT = $(BUILD_DIR)/libpalette.a
 $(LIB_OUT): $(LIB_OBJ)
+	mkdir -p $(BUILD_DIR)
 	rm -f $@
 	ar cq $@ $(LIB_OBJ)
 
@@ -82,6 +84,7 @@ TOOLS_COMMON_BUILD = $(CXX) -I$(TOOLS_DIR) \
 	-o $(TOOLS_COMMON_OBJ) \
 	-c $(TOOLS_COMMON_SRC)
 
+$(TOOLS_COMMON_OBJ): BUILD_FLAGS := -I$(TOOLS_DIR)
 
 MKSTRIPES_SRC = $(TOOLS_DIR)/mkstripes.cpp
 MKSTRIPES_OBJ = $(TOOLS_DIR)/mkstripes.o
@@ -105,10 +108,36 @@ MKSTRIPES_LINK = $(CXX) \
 
 # Target "mkstripes" to build the make-stripes tool.
 .PHONY: mkstripes
-mkstripes: $(LIB_OUT)
-	$(TOOLS_COMMON_BUILD)
+mkstripes: $(LIB_OUT) $(TOOLS_COMMON_OBJ)
 	$(MKSTRIPES_BUILD)
 	$(MKSTRIPES_LINK)
+
+
+MKWHEEL_SRC = $(TOOLS_DIR)/mkwheel.cpp
+MKWHEEL_OBJ = $(TOOLS_DIR)/mkwheel.o
+
+MKWHEEL_BUILD = $(CXX) \
+	$(MAGICK_FLAGS) \
+	-I$(LIB_DIR) \
+	-I$(TOOLS_DIR) \
+	-DEXEC_NAME=\"mkwheel\" \
+	-o $(MKWHEEL_OBJ) \
+	-c $(MKWHEEL_SRC)
+
+MKWHEEL_LINK = $(CXX) \
+	$(MAGICK_FLAGS) \
+	-o $(BUILD_DIR)/mkwheel \
+	$(MKWHEEL_OBJ) \
+	-L$(BUILD_DIR) \
+	-lboost_program_options \
+	-lpalette \
+	$(TOOLS_COMMON_OBJ)
+
+# Target "mkwheel " to build the make-stripes tool.
+.PHONY: mkwheel
+mkwheel: $(LIB_OUT) $(TOOLS_COMMON_OBJ)
+	$(MKWHEEL_BUILD)
+	$(MKWHEEL_LINK)
 
 
 GETCOLORS_SRC = $(TOOLS_DIR)/getcolors.cpp
@@ -133,12 +162,11 @@ GETCOLORS_LINK = $(CXX) \
 
 # Target "getcolors" to build the get-colors tool.
 .PHONY: getcolors
-getcolors: $(LIB_OUT)
-	$(TOOLS_COMMON_BUILD)
+getcolors: $(LIB_OUT) $(TOOLS_COMMON_OBJ)
 	$(GETCOLORS_BUILD)
 	$(GETCOLORS_LINK)
 
 
 # Target "tools" to build all tools.
 .PHONY: tools
-tools: mkstripes getcolors
+tools: mkstripes mkwheel getcolors

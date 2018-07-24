@@ -11,6 +11,9 @@ This repository currently contains the following:
   library.
 - Command-line tool `mkstripes`, which generates an image with stripes of
   specified colors.
+- Command-line tool `mkwheel`, which generates an image showing a specified
+  subset of a specified colorspace (e.g. all values of lightness and saturation
+  for a given hue).
 - Command-line tool `getcolors`, which prints a list of hex colors from a
   specified image file, optionally after colors in the image are reduced via
   quantization.
@@ -52,6 +55,14 @@ Ideally some of the featues of this software will include things such as:
   over number of colors generated.
 
 ### Dependencies
+
+To build:
+
+- C++17
+
+- Boost
+
+To run:
 
 - ImageMagick ([project page](http://www.imagemagick.org),
   [GitHub page](https://github.com/ImageMagick))
