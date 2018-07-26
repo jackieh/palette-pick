@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -11,6 +12,7 @@
 
 namespace {
     namespace bpo = boost::program_options;
+    namespace sch = std::chrono;
 
     class MkWheel : public Tool {
     public:
@@ -69,6 +71,9 @@ namespace {
         // Return 0 if successful, or return a nonzero int if a fatal error is
         // encountered.
         int run() {
+            sch::high_resolution_clock::time_point start_time =
+                sch::high_resolution_clock::now();
+
             if (help_) {
                 return exit_help();
             }
@@ -85,7 +90,6 @@ namespace {
                     << std::endl;
                 return exit_more_information();
             }
-
             int image_height = height_.value_or((int)default_height);
             if (image_height <= 0) {
                 std::cerr << "Error: Height option \"" << image_height
@@ -95,15 +99,27 @@ namespace {
             }
 
             // TODO: Create more types of color wheels.
+            int export_status = -1;
             if (type_.value().compare("hsl-hue") == 0) {
-                return run_hue(/* mirror */ false, image_height);
+                export_status = run_hue(/* mirror */ false, image_height);
             } else if (type_.value().compare("hsl-hue-mirror") == 0) {
-                return run_hue(/* mirror */ true, image_height);
+                export_status = run_hue(/* mirror */ true, image_height);
+            } else {
+                std::cerr << "Error: Unrecognized color wheel type \""
+                    << type_.value() << "\"" << std::endl;
+                return exit_more_information();
             }
 
-            std::cerr << "Error: Unrecognized color wheel type \""
-                << type_.value() << "\"" << std::endl;
-            return exit_more_information();
+            if (verbose_ && (export_status == 0)) {
+                sch::high_resolution_clock::time_point end_time =
+                    sch::high_resolution_clock::now();
+                auto duration = sch::duration_cast<sch::microseconds>(
+                    end_time - start_time).count();
+                std::cout << "Created " << output_file_.value() << " in "
+                    << duration << " microseconds" << std::endl;
+            }
+
+            return export_status;
         }
 
     private:
@@ -207,9 +223,6 @@ namespace {
         // a fatal error is encountered.
         int run_hue(const bool mirror, const int image_height) {
             const int image_width = (mirror ? image_height * 2 : image_height);
-            const double h_float = image_height;
-            const double w_float = image_width;
-            const double half_w_float = image_width / 2;
             double input_hue = 0;
             double input_saturation = 0;
             double input_lightness = 0;
@@ -243,25 +256,26 @@ namespace {
                     << std::fixed << (360.0 * input_hue) << std::endl;
             }
 
-            const Magick::Color canvas_color("white");
-            const Magick::Geometry canvas_size(image_width, image_height);
-            Magick::Image wheel(canvas_size, canvas_color);
+            // Evaluate hue, saturation, and lightness of each pixel using
+            // ImageMagick's fx expressions on the pixel's channels. Channel
+            // types are not straightforwardly named, as RedChannel signifies
+            // "channel 1," GreenChannel signifies "channel 2," etc. When the
+            // image's color space is set (from the RGB default) to HSL, then
+            // "channel 1" is the pixel's hue, "channel 2 is the pixel's
+            // saturation, etc.
+            Magick::Image wheel;
+            wheel.size(Magick::Geometry(image_width, image_height));
+            wheel.colorSpace(Magick::HSLColorspace);
+            const Magick::ChannelType hue_channel = Magick::RedChannel;
+            const Magick::ChannelType saturation_channel = Magick::GreenChannel;
+            const Magick::ChannelType lightness_channel = Magick::BlueChannel;
 
-            for (int x_idx = 0; x_idx < image_width; x_idx++) {
-                for (int y_idx = 0; y_idx < image_height; y_idx++) {
-                    const double x_float = x_idx;
-                    const double y_float = y_idx;
-                    const double local_lightness = y_float / h_float;
-                    const double local_saturation =
-                        (mirror ? ((x_float - h_float) / half_w_float)
-                         : (x_float / w_float));
-                    Magick::Color local_color = Magick::ColorHSL(
-                        input_hue, local_saturation, local_lightness);
-                        local_color.quantumAlpha(0xffff);
-                        wheel.fillColor(local_color);
-                        wheel.draw(Magick::DrawablePoint(x_idx, y_idx));
-                }
-            }
+            std::stringstream hue_fx_expr;
+            hue_fx_expr.precision(20);
+            hue_fx_expr << std::fixed << input_hue;
+            wheel.fx(hue_fx_expr.str(), hue_channel);
+            wheel.fx(mirror ? "(i-h)/h" : "i/w", saturation_channel);
+            wheel.fx("(h-j)/h", lightness_channel);
 
             try {
                 wheel.write(output_file_.value());
