@@ -44,10 +44,11 @@ run_magick_square() {
 #
 # Parameter 1: Name of the color space.
 run_magick_square_colorspace() {
-    echo "Creating $1 images..."
     SIZES="2 4 8 16 32 64 128 256 512 1024"
     mkdir -p out/${1,,}
     for size in $SIZES; do
+        printf "Creating %sx%s $1 images..." $size $size
+        start_time=`date +%s`
         mkdir -p out/${1,,}/$size
         run_magick_square "$1" $size "$FX_000" "$FX_H" "$FX_V" "${1:0:1}000"
         run_magick_square "$1" $size "$FX_025" "$FX_H" "$FX_V" "${1:0:1}025"
@@ -66,6 +67,8 @@ run_magick_square_colorspace() {
         run_magick_square "$1" $size "$FX_H" "$FX_V" "$FX_050" "${1:2:1}050"
         run_magick_square "$1" $size "$FX_H" "$FX_V" "$FX_075" "${1:2:1}075"
         run_magick_square "$1" $size "$FX_H" "$FX_V" "$FX_100" "${1:2:1}100"
+        end_time=`date +%s`
+        printf " done in `expr $end_time - $start_time` seconds.\n"
     done
 }
 
