@@ -8,8 +8,8 @@
 #include <boost/program_options.hpp>
 #include <Magick++.h>
 
-#include <tools_common.h>
-#include <stripes_image.h>
+#include "tools_common.h"
+#include "stripes_image.h"
 
 namespace {
     namespace bpo = boost::program_options;

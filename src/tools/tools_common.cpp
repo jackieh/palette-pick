@@ -3,7 +3,7 @@
 
 #include <boost/program_options.hpp>
 
-#include <tools_common.h>
+#include "tools_common.h"
 
 // Bare minimum functionality. Ideally the derived class redefines this
 // function to do more specific things with specific errors.

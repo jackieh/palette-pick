@@ -2,10 +2,11 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include <Magick++.h>
 
-#include <color_collection.h>
+#include "color_collection.h"
 
 namespace palette {
 

@@ -1,8 +1,8 @@
-#ifndef LIBRARY_COLOR_COLLECTION_H
-#define LIBRARY_COLOR_COLLECTION_H
+#pragma once
 
 #include <set>
 #include <string>
+#include <vector>
 
 #include <Magick++.h>
 
@@ -35,5 +35,3 @@ namespace palette {
         std::set<Magick::Color> colors_;
     };
 }
-
-#endif // LIBRARY_COLOR_COLLECTION_H

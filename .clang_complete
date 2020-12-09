@@ -1,0 +1,6 @@
+-I/usr/include/
+-I/usr/include/ImageMagick-7/
+-DMAGICKCORE_QUANTUM_DEPTH=8
+-DMAGICKCORE_HDRI_ENABLE=1
+-DEXEC_NAME=\"execname\"
+-std=c++17

@@ -8,7 +8,7 @@
 #include <boost/program_options.hpp>
 #include <Magick++.h>
 
-#include <tools_common.h>
+#include "tools_common.h"
 
 namespace {
     namespace bpo = boost::program_options;

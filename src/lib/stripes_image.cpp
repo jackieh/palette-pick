@@ -4,8 +4,8 @@
 
 #include <Magick++.h>
 
-#include <color_collection.h>
-#include <stripes_image.h>
+#include "color_collection.h"
+#include "stripes_image.h"
 
 namespace palette {
 

@@ -1,12 +1,11 @@
-#ifndef LIBRARY_STRIPES_IMAGE_H
-#define LIBRARY_STRIPES_IMAGE_H
+#pragma once
 
 #include <sstream>
 #include <string>
 
 #include <Magick++.h>
 
-#include <color_collection.h>
+#include "color_collection.h"
 
 namespace palette {
 
@@ -48,5 +47,3 @@ namespace palette {
         ColorCollection stripe_colors_;
     };
 }
-
-#endif // LIBRARY_STRIPES_IMAGE_H
