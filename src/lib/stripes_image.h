@@ -9,41 +9,41 @@
 
 namespace palette {
 
-    class StripesImage {
+class StripesImage {
+public:
+    enum ExportStatus { SUCCESS, FAIL };
+
+    class Orientation {
     public:
-        enum ExportStatus { SUCCESS, FAIL };
+        enum OValue { VERTICAL, HORIZONTAL, UNKNOWN };
 
-        class Orientation {
-        public:
-            enum OValue { VERTICAL, HORIZONTAL, UNKNOWN };
-
-            Orientation(OValue orientation_val);
-            Orientation(const std::string &orientation_str);
-            OValue get() const;
-            std::string to_string() const;
-
-        private:
-            OValue orientation_;
-            std::string repr_;
-        };
-
-        StripesImage();
-
-        void insert_color(Magick::Color color);
-        void set_length(int stripe_length);
-        void set_width(int stripe_width);
-        void set_orientation(Orientation stripe_orientation);
-
-        bool empty() const;
-        size_t size() const;
-        ExportStatus export_image(const std::string file_name,
-                                  std::stringstream &export_stream,
-                                  std::stringstream &error_stream);
+        Orientation(OValue orientation_val);
+        Orientation(const std::string &orientation_str);
+        OValue get() const;
+        std::string to_string() const;
 
     private:
-        int stripe_width_;
-        int stripe_length_;
-        Orientation stripe_orientation_;
-        ColorCollection stripe_colors_;
+        OValue orientation_;
+        std::string repr_;
     };
+
+    StripesImage();
+
+    void insert_color(Magick::Color color);
+    void set_length(int stripe_length);
+    void set_width(int stripe_width);
+    void set_orientation(Orientation stripe_orientation);
+
+    bool empty() const;
+    size_t size() const;
+    ExportStatus export_image(const std::string file_name,
+                              std::stringstream &export_stream,
+                              std::stringstream &error_stream);
+
+private:
+    int stripe_width_;
+    int stripe_length_;
+    Orientation stripe_orientation_;
+    ColorCollection stripe_colors_;
+};
 }
