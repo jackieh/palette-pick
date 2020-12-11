@@ -12,8 +12,7 @@ namespace palette {
 StripesImage::Orientation::Orientation(StripesImage::Orientation::OValue
                                        orientation_val) :
     orientation_(orientation_val),
-    repr_(std::string())
-{
+    repr_(std::string()) {
     switch (orientation_val) {
         case Orientation::OValue::VERTICAL: repr_ = "vertical"; break;
         case Orientation::OValue::HORIZONTAL: repr_ = "horizontal"; break;
@@ -24,8 +23,7 @@ StripesImage::Orientation::Orientation(StripesImage::Orientation::OValue
 StripesImage::Orientation::Orientation(const std::string &orientation_str) :
     orientation_(Orientation::OValue::UNKNOWN),
     // Store the input string so we can display it later if it's invalid.
-    repr_(std::string(orientation_str))
-{
+    repr_(std::string(orientation_str)) {
     if (orientation_str.compare("vertical") == 0) {
         orientation_ = Orientation::OValue::VERTICAL;
     } else if (orientation_str.compare("horizontal") == 0) {
@@ -37,16 +35,13 @@ StripesImage::Orientation::OValue StripesImage::Orientation::get() const {
     return orientation_;
 }
 
-std::string StripesImage::Orientation::to_string() const {
-    return repr_;
-}
+std::string StripesImage::Orientation::to_string() const { return repr_; }
 
 StripesImage::StripesImage() :
     stripe_width_(0),
     stripe_length_(0),
     stripe_orientation_(StripesImage::Orientation::UNKNOWN),
-    stripe_colors_(ColorCollection())
-{ }
+    stripe_colors_(ColorCollection()) { }
 
 void StripesImage::insert_color(Magick::Color color) {
     stripe_colors_.insert(color);
@@ -61,24 +56,18 @@ void StripesImage::set_width(int stripe_width) {
 }
 
 void StripesImage::set_orientation(StripesImage::Orientation
-                                   stripe_orientation)
-{
+                                   stripe_orientation) {
     stripe_orientation_ = stripe_orientation;
 }
 
-bool StripesImage::empty() const {
-    return (stripe_colors_.size() == 0);
-}
+bool StripesImage::empty() const { return (stripe_colors_.size() == 0); }
 
-size_t StripesImage::size() const {
-    return stripe_colors_.size();
-}
+size_t StripesImage::size() const { return stripe_colors_.size(); }
 
 StripesImage::ExportStatus StripesImage::export_image(
     const std::string file_name,
     std::stringstream &export_stream,
-    std::stringstream &error_stream)
-{
+    std::stringstream &error_stream) {
     if (stripe_length_ <= 0) {
         error_stream << "Image was configured with stripe length "
             << stripe_length_ << " which is not a positive integer; "

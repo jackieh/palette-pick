@@ -25,8 +25,7 @@ public:
         type_(std::nullopt),
         color_(std::nullopt),
         output_file_(std::nullopt),
-        options_string_(std::string())
-    { }
+        options_string_(std::string()) { }
 
     // Parse command line input into private members of this MkWheel
     // object. Return 0 if successful, or return a nonzero int if a fatal
@@ -51,10 +50,9 @@ public:
             std::cerr << "Error: Failed to interpret an argument after the "
                 << error.tokens() << " option";
             if (error.tokens().compare("--color") == 0) {
-                std::cerr << "; if the color value has a '#' character "
-                    << "then you must either place the color value in "
-                    << "quotes or prefix the '#' character with a '\\' "
-                    << "character";
+                std::cerr << "; if the color value has a '#' character then "
+                    << "you must either place the color value in quotes or "
+                    << "prefix the '#' character with a '\\' character";
             }
             std::cerr << std::endl;
             return exit_more_information();
@@ -63,9 +61,7 @@ public:
     }
 
     // Don't gather any stdin text.
-    void parse_stdin() {
-        return;
-    }
+    void parse_stdin() { return; }
 
     // Evaluate the collected command line options and export an image.
     // Return 0 if successful, or return a nonzero int if a fatal error is
@@ -86,8 +82,7 @@ public:
             return exit_more_information();
         }
         if (!type_.has_value()) {
-            std::cerr << "Error: No color wheel type specified"
-                << std::endl;
+            std::cerr << "Error: No color wheel type specified" << std::endl;
             return exit_more_information();
         }
         int image_height = height_.value_or((int)default_height);
@@ -132,9 +127,8 @@ private:
     // Return summary of the functionality of this tool.
     std::string usage_string() {
         std::stringstream usage_stream;
-        usage_stream << "Usage: " << exec_name()
-            << " [arguments] [output]" << std::endl
-            << "Create color wheel image of specified properties."
+        usage_stream << "Usage: " << exec_name() << " [arguments] [output]"
+            << std::endl << "Create color wheel image of specified properties."
             << std::endl << std::endl;
         usage_stream << "If generating an image, then "
             << "specifying exactly one color is required," << std::endl
@@ -148,8 +142,7 @@ private:
     std::string examples_string() {
         std::stringstream examples_stream;
         examples_stream << "Examples: " << exec_name()
-            << " -c cyan -t hsl-hue-mirror -H 512 -O output.png"
-            << std::endl;
+            << " -c cyan -t hsl-hue-mirror -H 512 -O output.png" << std::endl;
         examples_stream << "      or: " << exec_name()
             << " -c \"#FF0000\" --type hsl-hue output.gif" << std::endl;
         return examples_stream.str();
@@ -157,8 +150,7 @@ private:
 
     // Create names and a description for each command line option.
     void create_options(bpo::options_description &opt,
-                        bpo::positional_options_description &pos_opt)
-    {
+                        bpo::positional_options_description &pos_opt) {
         const char *help_chars = "Print this help message and exit";
         const char *verbose_chars = "Print extra information to stdout";
 
@@ -186,8 +178,7 @@ private:
             ("height,H", height_semantic, height_chars)
             ("type,t", type_semantic, type_chars)
             ("color,c", color_semantic, color_chars)
-            ("output,O", output_semantic, output_chars)
-        ;
+            ("output,O", output_semantic, output_chars);
         pos_opt.add("output", 1);
 
         std::stringstream options_stream;
@@ -280,8 +271,7 @@ private:
         try {
             wheel.write(output_file_.value());
         } catch (Magick::Exception &error) {
-            std::cerr << "ImageMagick exception: "
-                << error.what() << std::endl;
+            std::cerr << "ImageMagick exception: " << error.what() << std::endl;
             return exit_more_information();
         }
 

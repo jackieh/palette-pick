@@ -10,25 +10,19 @@
 
 namespace palette {
 
-ColorCollection::ColorCollection() :
-    colors_(std::set<Magick::Color>())
-{ }
+ColorCollection::ColorCollection() : colors_(std::set<Magick::Color>()) { }
 
 ColorCollection::ColorCollection(std::vector<Magick::Color> colors) :
-    colors_(std::set<Magick::Color>())
-{
+    colors_(std::set<Magick::Color>()) {
     colors_.insert(colors.begin(), colors.end());
 }
 
 ColorCollection::ColorCollection(ColorCollection &colors) :
-    colors_(std::set<Magick::Color>())
-{
+    colors_(std::set<Magick::Color>()) {
     colors_.insert(colors.begin(), colors.end());
 }
 
-void ColorCollection::insert(Magick::Color color) {
-    colors_.insert(color);
-}
+void ColorCollection::insert(Magick::Color color) { colors_.insert(color); }
 
 void ColorCollection::insert(std::vector<Magick::Color> colors) {
     colors_.insert(colors.begin(), colors.end());
@@ -73,11 +67,7 @@ std::string ColorCollection::to_string(std::string delimiter) const {
     return hex;
 }
 
-bool ColorCollection::empty() const {
-    return (colors_.size() == 0);
-}
+bool ColorCollection::empty() const { return (colors_.size() == 0); }
 
-size_t ColorCollection::size() const {
-    return colors_.size();
-}
+size_t ColorCollection::size() const { return colors_.size(); }
 }

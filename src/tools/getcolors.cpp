@@ -24,8 +24,7 @@ public:
         max_num_colors_(std::nullopt),
         quantize_tree_depth_(std::nullopt),
         input_file_(std::nullopt),
-        options_string_(std::string())
-    { }
+        options_string_(std::string()) { }
 
     // Parse command line input into private members of this GetColors
     // object. Return 0 if successful, or return a nonzero int if a fatal
@@ -64,11 +63,11 @@ public:
             std::cerr << "Error: No input file specified" << std::endl;
             return exit_more_information();
         }
-        int max_num_colors = max_num_colors_.value_or((int)default_max_num_colors);
+        int max_num_colors = max_num_colors_.value_or(
+            (int)default_max_num_colors);
         if (max_num_colors <= 0) {
             std::cerr << "Warning: number option \"" << max_num_colors
-                << "\" is not a positive integer; using default"
-                << std::endl;
+                << "\" is not a positive integer; using default" << std::endl;
             max_num_colors = (int)default_max_num_colors;
         }
         int quantize_tree_depth = quantize_tree_depth_.value_or(
@@ -96,10 +95,8 @@ public:
         size_t num_colors_reduced = image.totalColors();
         if (verbose_) {
             std::cout << "Image " << input_file_.value() << " contains "
-                << std::to_string(num_colors_original)
-                << " colors; reduced to "
-                << std::to_string(num_colors_reduced)
-                << " colors" << std::endl;
+                << std::to_string(num_colors_original) << " colors; reduced to "
+                << std::to_string(num_colors_reduced) << " colors" << std::endl;
         }
 
         palette::ColorCollection image_colors;
@@ -123,8 +120,7 @@ private:
     // Return summary of the functionality of this tool.
     std::string usage_string() {
         std::stringstream usage_stream;
-        usage_stream << "Usage: " << exec_name() << " [arguments]"
-            << std::endl;
+        usage_stream << "Usage: " << exec_name() << " [arguments]" << std::endl;
         usage_stream << "List colors in hex format from specified file."
             << std::endl;
         return usage_stream.str();
@@ -142,8 +138,7 @@ private:
 
     // Create names and a description for each command line option.
     void create_options(bpo::options_description &opt,
-                        bpo::positional_options_description &pos_opt)
-    {
+                        bpo::positional_options_description &pos_opt) {
         const char *help_chars = "Print this help message and exit";
         const char *verbose_chars = "Print extra information to stdout";
 
@@ -174,8 +169,7 @@ private:
             ("verbose,v", verbose_chars)
             ("number,n", number_semantic, number_chars)
             ("depth,d", depth_semantic, depth_chars)
-            ("input,I", input_semantic, input_chars)
-        ;
+            ("input,I", input_semantic, input_chars);
 
         pos_opt.add("input", 1);
 
@@ -193,7 +187,8 @@ private:
             max_num_colors_ = std::optional<int>(var_map["number"].as<int>());
         }
         if (!var_map["depth"].empty()) {
-            quantize_tree_depth_ = std::optional<int>(var_map["depth"].as<int>());
+            quantize_tree_depth_ =
+                std::optional<int>(var_map["depth"].as<int>());
         }
         if (!var_map["input"].empty()) {
             input_file_ = std::optional<std::string>(

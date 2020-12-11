@@ -28,8 +28,7 @@ public:
         orientation_(std::nullopt),
         output_file_(std::nullopt),
         colors_(std::vector<std::string>()),
-        options_string_(std::string())
-    { }
+        options_string_(std::string()) { }
 
     // Parse command line input into private members of this MkStripes
     // object. Return 0 if successful, or return a nonzero int if a fatal
@@ -53,10 +52,9 @@ public:
         } catch (bpo::invalid_command_line_syntax &error) {
             std::cerr << "Error: failed to interpret an argument after the "
                 << error.tokens() << " option; "
-                << "if the color value has a '#' character "
-                << "then you must either place the color value in quotes "
-                << "or prefix the '#' character with a '\\' character"
-                << std::endl;
+                << "if the color value has a '#' character then you must "
+                << "either place the color value in quotes or prefix the '#' "
+                << "character with a '\\' character" << std::endl;
             return exit_more_information();
         }
         return 0;
@@ -169,8 +167,7 @@ private:
 
     // Create names and a description for each command line option.
     void create_options(bpo::options_description &opt,
-                        bpo::positional_options_description &pos_opt)
-    {
+                        bpo::positional_options_description &pos_opt) {
         const char *help_chars = "Print this help message and exit";
         const char *verbose_chars = "Print extra information to stdout";
 
@@ -219,8 +216,7 @@ private:
             ("length,l", length_semantic, length_chars)
             ("orientation,o", orientation_semantic, orientation_chars)
             ("color,c", color_semantic, color_chars)
-            ("output,O", output_semantic, output_chars)
-        ;
+            ("output,O", output_semantic, output_chars);
         pos_opt.add("output", 1);
 
         std::stringstream options_stream;
