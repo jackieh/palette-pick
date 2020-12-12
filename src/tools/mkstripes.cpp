@@ -15,7 +15,7 @@ namespace {
 namespace bpo = boost::program_options;
 
 class MkStripes : public Tool {
-public:
+ public:
     static const size_t default_width = 100;
     static const size_t default_length_multiplier = 100;
     static constexpr const char *default_orientation = "vertical";
@@ -105,10 +105,11 @@ public:
         }
         size_t number_of_stripes = image.size();
 
-        image.set_width(width_.value_or((int)default_width));
+        image.set_width(width_.value_or(static_cast<int>(default_width)));
         image.set_length(length_.value_or(number_of_stripes
                                           * default_length_multiplier));
-        image.set_orientation(orientation_.value_or(default_orientation));
+        image.set_orientation(palette::StripesImage::Orientation(
+                orientation_.value_or(default_orientation)));
 
         // Export the image.
         std::stringstream verbose_stream;
@@ -131,7 +132,7 @@ public:
         assert(0);
     }
 
-private:
+ private:
     // Return the name of the executable file.
     std::string exec_name() { return EXEC_NAME; }
 
@@ -260,7 +261,7 @@ private:
     std::vector<std::string> colors_;
     std::string options_string_;
 };
-} // Unnamed namespace
+}  // namespace
 
 int main(int argc, char **argv) {
     Magick::InitializeMagick(*argv);

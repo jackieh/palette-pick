@@ -14,7 +14,7 @@ namespace {
 namespace bpo = boost::program_options;
 
 class GetColors : public Tool {
-public:
+ public:
     static const size_t default_max_num_colors = 16;
     static const size_t default_quantize_tree_depth = 8;
 
@@ -64,18 +64,18 @@ public:
             return exit_more_information();
         }
         int max_num_colors = max_num_colors_.value_or(
-            (int)default_max_num_colors);
+            static_cast<int>(default_max_num_colors));
         if (max_num_colors <= 0) {
             std::cerr << "Warning: number option \"" << max_num_colors
                 << "\" is not a positive integer; using default" << std::endl;
-            max_num_colors = (int)default_max_num_colors;
+            max_num_colors = static_cast<int>(default_max_num_colors);
         }
         int quantize_tree_depth = quantize_tree_depth_.value_or(
-            (int)default_quantize_tree_depth);
+            static_cast<int>(default_quantize_tree_depth));
         if (quantize_tree_depth < 0) {
             std::cerr << "Warning: depth option \"" << quantize_tree_depth
                 << "\" is a negative integer; using default" << std::endl;
-            max_num_colors = (int)default_max_num_colors;
+            max_num_colors = static_cast<int>(default_max_num_colors);
         }
 
         // Load image from input file.
@@ -110,7 +110,7 @@ public:
         return 0;
     }
 
-private:
+ private:
     // Return the name of the executable file.
     std::string exec_name() { return EXEC_NAME; }
 
@@ -203,7 +203,7 @@ private:
     std::optional<std::string> input_file_;
     std::string options_string_;
 };
-} // Unnamed namespace
+}  // namespace
 
 int main(int argc, char **argv) {
     Magick::InitializeMagick(*argv);

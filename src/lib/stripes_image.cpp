@@ -142,4 +142,4 @@ StripesImage::ExportStatus StripesImage::export_image(
         << stripe_colors_.to_string(", ") << std::endl;
     return ExportStatus::SUCCESS;
 }
-} // namespace palette
+}  // namespace palette

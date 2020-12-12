@@ -5,12 +5,12 @@
 #include <boost/program_options.hpp>
 
 class Tool {
-public:
+ public:
     virtual ~Tool() { }
     virtual int parse_options(int argc, char **argv);
     virtual int run() = 0;
 
-protected:
+ protected:
     int exit_help();
     int exit_more_information();
     void try_parse_options(int argc, char **argv);

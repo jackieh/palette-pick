@@ -10,19 +10,19 @@
 namespace palette {
 
 class StripesImage {
-public:
+ public:
     enum ExportStatus { SUCCESS, FAIL };
 
     class Orientation {
-    public:
+     public:
         enum OValue { VERTICAL, HORIZONTAL, UNKNOWN };
 
-        Orientation(OValue orientation_val);
-        Orientation(const std::string &orientation_str);
+        explicit Orientation(OValue orientation_val);
+        explicit Orientation(const std::string &orientation_str);
         OValue get() const;
         std::string to_string() const;
 
-    private:
+     private:
         OValue orientation_;
         std::string repr_;
     };
@@ -40,10 +40,10 @@ public:
                               std::stringstream &export_stream,
                               std::stringstream &error_stream);
 
-private:
+ private:
     int stripe_width_;
     int stripe_length_;
     Orientation stripe_orientation_;
     ColorCollection stripe_colors_;
 };
-}
+}  // namespace palette

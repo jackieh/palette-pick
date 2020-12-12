@@ -33,6 +33,15 @@ clean:
 	rm -rf $(BUILD_DIR)/images/*
 	rm -f $(BUILD_DIR)/*
 
+# Target "lint" to run linter.
+.PHONY: lint
+lint:
+	cpplint \
+		--filter=-build/c++11,-build/include_subdir,-legal/copyright,-readability/todo,-runtime/references \
+		--recursive \
+		--extensions=h,cpp \
+		$(SRC_DIR)
+
 
 ################################################################################
 #  _     _ _

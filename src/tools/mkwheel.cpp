@@ -15,7 +15,7 @@ namespace bpo = boost::program_options;
 namespace sch = std::chrono;
 
 class MkWheel : public Tool {
-public:
+ public:
     static const size_t default_height = 256;
 
     MkWheel() :
@@ -85,7 +85,7 @@ public:
             std::cerr << "Error: No color wheel type specified" << std::endl;
             return exit_more_information();
         }
-        int image_height = height_.value_or((int)default_height);
+        int image_height = height_.value_or(static_cast<int>(default_height));
         if (image_height <= 0) {
             std::cerr << "Error: Height option \"" << image_height
                 << "\" specified; height must be a positive integer"
@@ -117,7 +117,7 @@ public:
         return export_status;
     }
 
-private:
+ private:
     // Return the name of the executable file.
     std::string exec_name() { return EXEC_NAME; }
 
@@ -286,7 +286,7 @@ private:
     std::optional<std::string> output_file_;
     std::string options_string_;
 };
-} // Unnamed namespace
+}  // namespace
 
 int main(int argc, char **argv) {
     Magick::InitializeMagick(*argv);

@@ -59,9 +59,9 @@ std::string ColorCollection::to_string(std::string delimiter) const {
             hex_stringstream << delimiter;
         }
         hex_stringstream << "#"
-            << std::setw(2) << ((int)color.quantumRed() >> 8)
-            << std::setw(2) << ((int)color.quantumGreen() >> 8)
-            << std::setw(2) << ((int)color.quantumBlue() >> 8);
+            << std::setw(2) << (static_cast<int>(color.quantumRed()) >> 8)
+            << std::setw(2) << (static_cast<int>(color.quantumGreen()) >> 8)
+            << std::setw(2) << (static_cast<int>(color.quantumBlue()) >> 8);
     }
     std::string hex(hex_stringstream.str());
     return hex;
@@ -70,4 +70,4 @@ std::string ColorCollection::to_string(std::string delimiter) const {
 bool ColorCollection::empty() const { return (colors_.size() == 0); }
 
 size_t ColorCollection::size() const { return colors_.size(); }
-}
+}  // namespace palette

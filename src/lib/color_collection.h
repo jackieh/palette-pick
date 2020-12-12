@@ -11,9 +11,9 @@ namespace palette {
 // TODO: Make ColorCollection an abstract base class, from which the
 //       subclasses ColorVector and ColorSet are derived.
 class ColorCollection {
-public:
+ public:
     ColorCollection();
-    ColorCollection(std::vector<Magick::Color> colors);
+    explicit ColorCollection(std::vector<Magick::Color> colors);
     ColorCollection(ColorCollection &colors);
 
     void insert(Magick::Color color);
@@ -31,7 +31,7 @@ public:
     bool empty() const;
     size_t size() const;
 
-private:
+ private:
     std::set<Magick::Color> colors_;
 };
-}
+}  // namespace palette
