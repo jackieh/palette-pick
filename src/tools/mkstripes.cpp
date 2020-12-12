@@ -12,6 +12,7 @@
 #include "stripes_image.h"
 
 namespace {
+
 namespace bpo = boost::program_options;
 
 class MkStripes : public Tool {

@@ -11,6 +11,7 @@
 #include "tools_common.h"
 
 namespace {
+
 namespace bpo = boost::program_options;
 namespace sch = std::chrono;
 

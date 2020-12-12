@@ -11,6 +11,7 @@
 #include "color_collection.h"
 
 namespace {
+
 namespace bpo = boost::program_options;
 
 class GetColors : public Tool {
