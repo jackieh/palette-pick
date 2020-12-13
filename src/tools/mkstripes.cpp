@@ -9,6 +9,7 @@
 #include <Magick++.h>
 
 #include "tools_common.h"
+#include "orientation.h"
 #include "stripes_image.h"
 
 namespace {
@@ -85,52 +86,60 @@ class MkStripes : public Tool {
             std::cerr << "Error: No output file specified" << std::endl;
             return exit_more_information();
         }
-        palette::StripesImage image;
 
-        // Set colors.
+        const std::string stripe_orientation_string(
+            orientation_.value_or(default_orientation));
+        const palette::Orientation stripe_orientation(
+            stripe_orientation_string);
+        if (!stripe_orientation.valid()) {
+            std::cerr << "\"" << stripe_orientation_string
+                << "\" is not a valid orientation; it must be either "
+                << "\"vertical\" or \"horizontal\"" << std::endl;
+            return exit_more_information();
+        }
+
+        // Validate colors.
+        std::vector<Magick::Color> colors;
         for (const auto &color_str : colors_) {
             try {
-                Magick::Color color_obj(color_str);
-                image.insert_color(color_obj);
+                colors.emplace_back(color_str);
             } catch (Magick::Exception &error) {
                 std::cerr << "Warning: color option \"" << color_str
                     << "\" could not be interpreted as a color; ignoring"
                     << std::endl;
             }
         }
-        if (image.empty()) {
-            std::cerr << "No colors have been gathered; "
-                << "colors are required in order to generate an image"
+        if (colors.empty()) {
+            std::cerr << "No valid colors have been gathered; "
+                << "generating an image requires at least one color"
                 << std::endl;
             return exit_more_information();
         }
-        size_t number_of_stripes = image.size();
 
-        image.set_width(width_.value_or(static_cast<int>(default_width)));
-        image.set_length(length_.value_or(number_of_stripes
-                                          * default_length_multiplier));
-        image.set_orientation(palette::StripesImage::Orientation(
-                orientation_.value_or(default_orientation)));
+        const int stripe_length = length_.value_or(
+            colors.size() * default_length_multiplier);
+        const int stripe_width = width_.value_or(
+            static_cast<int>(default_width));
+        palette::StripesImage image(stripe_length, stripe_width,
+                                    stripe_orientation);
+        for (const auto &color : colors) {
+            image.get_colors().insert(color);
+        }
 
         // Export the image.
         std::stringstream verbose_stream;
         std::stringstream error_stream;
-        palette::StripesImage::ExportStatus export_status =
+        const bool export_success =
             image.export_image(output_file_.value(),
                                verbose_stream, error_stream);
-        switch (export_status) {
-            case palette::StripesImage::SUCCESS:
-                if (verbose_) {
-                    std::cout << verbose_stream.str();
-                }
-                return 0;
-            case palette::StripesImage::FAIL:
-                std::cerr << "Error: " << error_stream.str();
-                return exit_more_information();
+        if (!export_success) {
+            std::cerr << "Error: " << error_stream.str();
+            return exit_more_information();
         }
-
-        // If the control flow ends up here then the code is incorrect.
-        assert(0);
+        if (verbose_) {
+            std::cout << verbose_stream.str();
+        }
+        return 0;
     }
 
  private:

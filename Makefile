@@ -54,6 +54,7 @@ lint:
 
 LIB_OBJ = \
 	$(LIB_DIR)/color_collection.o \
+	$(LIB_DIR)/orientation.o \
 	$(LIB_DIR)/stripes_image.o
 LIB_SRC = $(LIB_OBJ:.o=.cpp)
 $(LIB_DIR)/%.o: BUILD_FLAGS := -I$(LIB_DIR) $(MAGICK_FLAGS)
