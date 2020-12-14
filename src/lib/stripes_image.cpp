@@ -3,7 +3,8 @@
 
 #include <Magick++.h>
 
-#include "color_collection.h"
+#include "color.h"
+#include "color_vector.h"
 #include "orientation.h"
 #include "stripes_image.h"
 
@@ -17,13 +18,13 @@ StripesImage::StripesImage(int stripe_length,
     stripe_orientation_(stripe_orientation),
     stripe_colors_() { }
 
-ColorCollection &StripesImage::get_colors() { return stripe_colors_; }
+ColorVector &StripesImage::get_stripe_colors() { return stripe_colors_; }
 
 // Return whether or not export was successful.
 bool StripesImage::export_image(const std::string file_name,
                                 std::stringstream &export_stream,
                                 std::stringstream &error_stream) {
-    if (stripe_colors_.empty()) {
+    if (stripe_colors_.get().empty()) {
         error_stream << "Empty list of colors" << std::endl;
         return false;
     }
@@ -46,12 +47,12 @@ bool StripesImage::export_image(const std::string file_name,
     int image_height;
     switch (stripe_orientation_.get()) {
         case Orientation::Value::vertical:
-            image_width = stripe_width_ * stripe_colors_.size();
+            image_width = stripe_width_ * stripe_colors_.get().size();
             image_height = stripe_length_;
             break;
         case Orientation::Value::horizontal:
             image_width = stripe_length_;
-            image_height = stripe_width_ * stripe_colors_.size();
+            image_height = stripe_width_ * stripe_colors_.get().size();
             break;
         default:
             error_stream << "Unknown stripes orientation" << std::endl;
@@ -61,12 +62,12 @@ bool StripesImage::export_image(const std::string file_name,
     // Initialize image as a canvas with the first color in the collection
     // of stripe colors.
     const Magick::Geometry canvas_size(image_width, image_height);
-    const Magick::Color canvas_color(*stripe_colors_.cbegin());
-    Magick::Image stripes(canvas_size, canvas_color);
+    const Color canvas_color(*stripe_colors_.get().cbegin());
+    Magick::Image stripes(canvas_size, canvas_color.get());
 
     int stripe_idx = 0;
-    for (const auto &stripe_color : stripe_colors_) {
-        stripes.fillColor(stripe_color);
+    for (const auto &stripe_color : stripe_colors_.get()) {
+        stripes.fillColor(stripe_color.get());
         int stripe_width_begin = stripe_idx * stripe_width_;
         switch (stripe_orientation_.get()) {
             case Orientation::Value::vertical:

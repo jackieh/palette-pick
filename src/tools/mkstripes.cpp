@@ -9,6 +9,7 @@
 #include <Magick++.h>
 
 #include "tools_common.h"
+#include "color.h"
 #include "orientation.h"
 #include "stripes_image.h"
 
@@ -99,17 +100,17 @@ class MkStripes : public Tool {
         }
 
         // Validate colors.
-        std::vector<Magick::Color> colors;
+        std::vector<Magick::Color> magick_colors;
         for (const auto &color_str : colors_) {
             try {
-                colors.emplace_back(color_str);
+                magick_colors.emplace_back(color_str);
             } catch (Magick::Exception &error) {
                 std::cerr << "Warning: color option \"" << color_str
                     << "\" could not be interpreted as a color; ignoring"
                     << std::endl;
             }
         }
-        if (colors.empty()) {
+        if (magick_colors.empty()) {
             std::cerr << "No valid colors have been gathered; "
                 << "generating an image requires at least one color"
                 << std::endl;
@@ -117,13 +118,13 @@ class MkStripes : public Tool {
         }
 
         const int stripe_length = length_.value_or(
-            colors.size() * default_length_multiplier);
+            magick_colors.size() * default_length_multiplier);
         const int stripe_width = width_.value_or(
             static_cast<int>(default_width));
         palette::StripesImage image(stripe_length, stripe_width,
                                     stripe_orientation);
-        for (const auto &color : colors) {
-            image.get_colors().insert(color);
+        for (const auto &magick_color : magick_colors) {
+            image.get_stripe_colors().get().emplace_back(magick_color);
         }
 
         // Export the image.

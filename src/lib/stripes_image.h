@@ -2,11 +2,8 @@
 
 #include <sstream>
 #include <string>
-#include <vector>
 
-#include <Magick++.h>
-
-#include "color_collection.h"
+#include "color_vector.h"
 #include "orientation.h"
 
 namespace palette {
@@ -17,7 +14,7 @@ class StripesImage {
                  int stripe_width,
                  const Orientation &stripe_orientation);
 
-    ColorCollection &get_colors();
+    ColorVector &get_stripe_colors();
 
     bool export_image(const std::string file_name,
                       std::stringstream &export_stream,
@@ -27,6 +24,6 @@ class StripesImage {
     int stripe_length_;
     int stripe_width_;
     Orientation stripe_orientation_;
-    ColorCollection stripe_colors_;
+    ColorVector stripe_colors_;
 };
 }  // namespace palette

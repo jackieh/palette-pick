@@ -8,6 +8,7 @@
 #include <Magick++.h>
 
 #include "tools_common.h"
+#include "color.h"
 #include "color_collection.h"
 
 namespace {
@@ -104,7 +105,7 @@ class GetColors : public Tool {
         std::vector<std::pair<Magick::Color, size_t> > color_histogram;
         Magick::colorHistogram(&color_histogram, image);
         for (auto histogram_elem : color_histogram) {
-            image_colors.insert(histogram_elem.first);
+            image_colors.get().emplace(histogram_elem.first);
         }
 
         std::cout << image_colors.to_string("\n") << std::endl;

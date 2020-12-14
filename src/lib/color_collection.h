@@ -2,36 +2,27 @@
 
 #include <set>
 #include <string>
-#include <vector>
-
-#include <Magick++.h>
 
 namespace palette {
 
-// TODO: Make ColorCollection an abstract base class, from which the
-//       subclasses ColorVector and ColorSet are derived.
+class Color;
+
 class ColorCollection {
  public:
     ColorCollection();
-    explicit ColorCollection(std::vector<Magick::Color> colors);
-    ColorCollection(ColorCollection &colors);
+    explicit ColorCollection(const std::set<Color> &colors);
+    explicit ColorCollection(std::set<Color> &&colors);
+    ColorCollection(const ColorCollection &other);
+    ColorCollection(ColorCollection &&other);
 
-    void insert(Magick::Color color);
-    void insert(std::vector<Magick::Color> colors);
-    void insert(ColorCollection colors);
+    ColorCollection &operator=(const ColorCollection &other);
 
-    typedef std::set<Magick::Color>::iterator iterator;
-    typedef std::set<Magick::Color>::const_iterator const_iterator;
-    iterator begin() noexcept;
-    const_iterator cbegin() const noexcept;
-    iterator end() noexcept;
-    const_iterator cend() const noexcept;
+    std::set<Color> &get();
+    const std::set<Color> &get() const;
 
-    std::string to_string(std::string delimiter) const;
-    bool empty() const;
-    size_t size() const;
+    std::string to_string(const std::string &delimiter) const;
 
  private:
-    std::set<Magick::Color> colors_;
+    std::set<Color> colors_;
 };
 }  // namespace palette

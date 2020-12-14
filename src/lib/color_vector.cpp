@@ -1,40 +1,40 @@
 #include <iomanip>
-#include <set>
 #include <sstream>
 #include <string>
+#include <vector>
 #include <utility>
 
 #include "color.h"
-#include "color_collection.h"
+#include "color_vector.h"
 
 namespace palette {
 
-ColorCollection::ColorCollection() : colors_() { }
+ColorVector::ColorVector() : colors_() { }
 
-ColorCollection::ColorCollection(const std::set<Color> &colors) :
+ColorVector::ColorVector(const std::vector<Color> &colors) :
     colors_(colors.begin(), colors.end()) { }
 
-ColorCollection::ColorCollection(std::set<Color> &&colors) :
+ColorVector::ColorVector(std::vector<Color> &&colors) :
     colors_(std::move(colors)) { }
 
-ColorCollection::ColorCollection(const ColorCollection &other) :
+ColorVector::ColorVector(const ColorVector &other) :
     colors_(other.colors_.begin(), other.colors_.end()) { }
 
-ColorCollection::ColorCollection(ColorCollection &&other) :
+ColorVector::ColorVector(ColorVector &&other) :
     colors_(std::move(other.colors_)) { }
 
-ColorCollection &ColorCollection::operator=(const ColorCollection &other) {
+ColorVector &ColorVector::operator=(const ColorVector &other) {
     colors_ = other.colors_;
     return *this;
 }
 
-std::set<Color> &ColorCollection::get() { return colors_; }
+std::vector<Color> &ColorVector::get() { return colors_; }
 
-const std::set<Color> &ColorCollection::get() const {
+const std::vector<Color> &ColorVector::get() const {
     return colors_;
 }
 
-std::string ColorCollection::to_string(const std::string &delimiter) const {
+std::string ColorVector::to_string(const std::string &delimiter) const {
     std::stringstream hex_stringstream;
     hex_stringstream << std::setfill('0') << std::hex << std::uppercase;
     bool first_elem = true;
