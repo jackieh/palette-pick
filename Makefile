@@ -54,7 +54,7 @@ lint:
 
 LIB_OBJ = \
 	$(LIB_DIR)/color.o \
-	$(LIB_DIR)/color_collection.o \
+	$(LIB_DIR)/color_set.o \
 	$(LIB_DIR)/color_vector.o \
 	$(LIB_DIR)/orientation.o \
 	$(LIB_DIR)/stripes_image.o

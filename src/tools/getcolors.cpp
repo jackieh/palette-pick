@@ -9,7 +9,7 @@
 
 #include "tools_common.h"
 #include "color.h"
-#include "color_collection.h"
+#include "color_set.h"
 
 namespace {
 
@@ -101,7 +101,7 @@ class GetColors : public Tool {
                 << std::to_string(num_colors_reduced) << " colors" << std::endl;
         }
 
-        palette::ColorCollection image_colors;
+        palette::ColorSet image_colors;
         std::vector<std::pair<Magick::Color, size_t> > color_histogram;
         Magick::colorHistogram(&color_histogram, image);
         for (auto histogram_elem : color_histogram) {

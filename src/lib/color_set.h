@@ -7,15 +7,15 @@ namespace palette {
 
 class Color;
 
-class ColorCollection {
+class ColorSet {
  public:
-    ColorCollection();
-    explicit ColorCollection(const std::set<Color> &colors);
-    explicit ColorCollection(std::set<Color> &&colors);
-    ColorCollection(const ColorCollection &other);
-    ColorCollection(ColorCollection &&other);
+    ColorSet();
+    explicit ColorSet(const std::set<Color> &colors);
+    explicit ColorSet(std::set<Color> &&colors);
+    ColorSet(const ColorSet &other);
+    ColorSet(ColorSet &&other);
 
-    ColorCollection &operator=(const ColorCollection &other);
+    ColorSet &operator=(const ColorSet &other);
 
     std::set<Color> &get();
     const std::set<Color> &get() const;
