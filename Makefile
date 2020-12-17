@@ -30,7 +30,6 @@ cleanobj:
 .PHONY: clean
 clean:
 	$(RM_OBJ_CMD)
-	rm -rf $(BUILD_DIR)/images/*
 	rm -f $(BUILD_DIR)/*
 
 # Target "lint" to run linter.
