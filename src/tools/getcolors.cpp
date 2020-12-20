@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <optional>
@@ -104,6 +105,7 @@ class GetColors : public Tool {
 
         palette::ColorVector image_colors;
         image_colors.get() = image.get_unique_colors();
+        std::sort(image_colors.get().begin(), image_colors.get().end());
         std::cout << image_colors.to_string("\n") << std::endl;
         return 0;
     }

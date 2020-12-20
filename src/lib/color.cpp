@@ -33,15 +33,31 @@ bool Color::operator!=(const Color &other) const {
 }
 
 bool Color::operator<(const Color &other) const {
-    Magick::ColorHSL color_hsl(color_);
-    Magick::ColorHSL other_hsl(other.color_);
-    if (color_hsl.hue() == other_hsl.hue()) {
-        if (color_hsl.saturation() == other_hsl.saturation()) {
-            return (color_hsl.lightness() < other_hsl.lightness());
+    return color_ < other.color_;
+}
+
+bool Color::lessThanRgb(const Color &left, const Color &right) {
+    Magick::ColorRGB left_rgb(left.color_);
+    Magick::ColorRGB right_rgb(right.color_);
+    if (left_rgb.red() == right_rgb.red()) {
+        if (left_rgb.green() == right_rgb.green()) {
+            return (left_rgb.blue() < right_rgb.blue());
         }
-        return (color_hsl.saturation() < other_hsl.saturation());
+        return (left_rgb.green() < right_rgb.green());
     }
-    return (color_hsl.hue() < other_hsl.hue());
+    return (left_rgb.red() < right_rgb.red());
+}
+
+bool Color::lessThanHsl(const Color &left, const Color &right) {
+    Magick::ColorHSL left_hsl(left.color_);
+    Magick::ColorHSL right_hsl(right.color_);
+    if (left_hsl.hue() == right_hsl.hue()) {
+        if (left_hsl.saturation() == right_hsl.saturation()) {
+            return (left_hsl.lightness() < right_hsl.lightness());
+        }
+        return (left_hsl.saturation() < right_hsl.saturation());
+    }
+    return (left_hsl.hue() < right_hsl.hue());
 }
 
 Magick::Color &Color::get() { return color_; }

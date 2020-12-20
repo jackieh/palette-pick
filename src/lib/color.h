@@ -20,6 +20,9 @@ class Color {
     bool operator!=(const Color &other) const;
     bool operator<(const Color &other) const;
 
+    static bool lessThanRgb(const Color &left, const Color &right);
+    static bool lessThanHsl(const Color &left, const Color &right);
+
     Magick::Color &get();
     const Magick::Color &get() const;
 
