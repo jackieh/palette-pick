@@ -9,7 +9,8 @@
 
 #include "tools_common.h"
 #include "color.h"
-#include "color_set.h"
+#include "color_vector.h"
+#include "image.h"
 
 namespace {
 
@@ -81,33 +82,28 @@ class GetColors : public Tool {
         }
 
         // Load image from input file.
-        Magick::Image image;
+        palette::Image image;
         try {
-            image.read(input_file_.value());
+            image.get().read(input_file_.value());
         } catch (Magick::Exception &error) {
             std::cerr << error.what() << std::endl;
             return 1;
         }
 
         // Reduce colors in image if needed.
-        size_t num_colors_original = image.totalColors();
-        image.quantizeTreeDepth(quantize_tree_depth);
-        image.quantizeColors(max_num_colors);
-        image.quantize();
-        size_t num_colors_reduced = image.totalColors();
+        size_t num_colors_original = image.get().totalColors();
+        image.get().quantizeTreeDepth(quantize_tree_depth);
+        image.get().quantizeColors(max_num_colors);
+        image.get().quantize();
+        size_t num_colors_reduced = image.get().totalColors();
         if (verbose_) {
             std::cout << "Image " << input_file_.value() << " contains "
                 << std::to_string(num_colors_original) << " colors; reduced to "
                 << std::to_string(num_colors_reduced) << " colors" << std::endl;
         }
 
-        palette::ColorSet image_colors;
-        std::vector<std::pair<Magick::Color, size_t> > color_histogram;
-        Magick::colorHistogram(&color_histogram, image);
-        for (auto histogram_elem : color_histogram) {
-            image_colors.get().emplace(histogram_elem.first);
-        }
-
+        palette::ColorVector image_colors;
+        image_colors.get() = image.get_unique_colors();
         std::cout << image_colors.to_string("\n") << std::endl;
         return 0;
     }

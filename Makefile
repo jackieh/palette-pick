@@ -55,6 +55,7 @@ LIB_OBJ = \
 	$(LIB_DIR)/color.o \
 	$(LIB_DIR)/color_set.o \
 	$(LIB_DIR)/color_vector.o \
+	$(LIB_DIR)/image.o \
 	$(LIB_DIR)/orientation.o \
 	$(LIB_DIR)/stripes_image.o
 LIB_SRC = $(LIB_OBJ:.o=.cpp)
