@@ -19,7 +19,6 @@ namespace bpo = boost::program_options;
 
 class GetColors : public Tool {
  public:
-    static const size_t default_max_num_colors = 16;
     static const size_t default_quantize_tree_depth = 8;
 
     GetColors() :
@@ -67,19 +66,21 @@ class GetColors : public Tool {
             std::cerr << "Error: No input file specified" << std::endl;
             return exit_more_information();
         }
-        int max_num_colors = max_num_colors_.value_or(
-            static_cast<int>(default_max_num_colors));
-        if (max_num_colors <= 0) {
-            std::cerr << "Warning: number option \"" << max_num_colors
-                << "\" is not a positive integer; using default" << std::endl;
-            max_num_colors = static_cast<int>(default_max_num_colors);
+        if (!max_num_colors_.has_value()) {
+            std::cerr << "Error: No number of colors specified" << std::endl;
+            return exit_more_information();
+        }
+        if (*max_num_colors_ <= 0) {
+            std::cerr << "Error: Number of colors must be a positive integer"
+                << std::endl;
+            return exit_more_information();
         }
         int quantize_tree_depth = quantize_tree_depth_.value_or(
             static_cast<int>(default_quantize_tree_depth));
         if (quantize_tree_depth < 0) {
             std::cerr << "Warning: depth option \"" << quantize_tree_depth
                 << "\" is a negative integer; using default" << std::endl;
-            max_num_colors = static_cast<int>(default_max_num_colors);
+            quantize_tree_depth = static_cast<int>(default_quantize_tree_depth);
         }
 
         // Load image from input file.
@@ -94,7 +95,7 @@ class GetColors : public Tool {
         // Reduce colors in image if needed.
         size_t num_colors_original = image.get().totalColors();
         image.get().quantizeTreeDepth(quantize_tree_depth);
-        image.get().quantizeColors(max_num_colors);
+        image.get().quantizeColors(*max_num_colors_);
         image.get().quantize();
         size_t num_colors_reduced = image.get().totalColors();
         if (verbose_) {
@@ -130,7 +131,7 @@ class GetColors : public Tool {
     std::string examples_string() {
         std::stringstream examples_stream;
         examples_stream << "Examples: " << exec_name()
-            << " -I input.png" << std::endl;
+            << " -n 4 -I input.png" << std::endl;
         examples_stream << "      or: " << exec_name()
             << " --number 24 input.gif" << std::endl;
         return examples_stream.str();
@@ -144,7 +145,7 @@ class GetColors : public Tool {
 
         std::stringstream number_stream;
         number_stream << "Specify maximum number of colors to list "
-            "from the image (default " << default_max_num_colors << " )";
+            "from the image";
         std::string number_string = number_stream.str();
         const char *number_chars = number_string.c_str();
         const auto *number_semantic(bpo::value<int>());
@@ -152,7 +153,7 @@ class GetColors : public Tool {
         std::stringstream depth_stream;
         depth_stream << "Specify depth of tree used "
             << "in color quantization algorithm (default "
-            << default_quantize_tree_depth << " )";
+            << default_quantize_tree_depth << ")";
         std::string depth_string = depth_stream.str();
         const char *depth_chars = depth_string.c_str();
         const auto *depth_semantic(bpo::value<int>());
