@@ -42,12 +42,12 @@ for i in {1..8}; do
         printf "Creating stripes images for $n colors with tree depth $d..."
         start_time=`date +%s`
 
-        stripes_file_name=$n-colors-stripes-quantized-tree-depth-$d-from-original.png
+        stripes_file_name=$n-colors-stripes-quantized-from-original-tree-depth-$d.png
         stripes_file_path=$output_directory_path/$stripes_file_name
         ./build/getcolors -n $n -d $d -I $input_file_path \
             | ./build/mkstripes -O $stripes_file_path
 
-        stripes_file_name=$n-colors-stripes-quantized-tree-depth-$d-from-posterized.png
+        stripes_file_name=$n-colors-stripes-quantized-from-posterized-tree-depth-$d.png
         stripes_file_path=$output_directory_path/$stripes_file_name
         ./build/getcolors -n $n -d $d -I $posterize_file_path \
             | ./build/mkstripes -O $stripes_file_path
