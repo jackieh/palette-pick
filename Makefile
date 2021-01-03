@@ -53,9 +53,11 @@ lint:
 
 LIB_OBJ = \
 	$(LIB_DIR)/color.o \
+	$(LIB_DIR)/color_k_means.o \
 	$(LIB_DIR)/color_set.o \
 	$(LIB_DIR)/color_vector.o \
 	$(LIB_DIR)/image.o \
+	$(LIB_DIR)/image_get_sample_colors_mode.o \
 	$(LIB_DIR)/orientation.o \
 	$(LIB_DIR)/stripes_image.o
 LIB_SRC = $(LIB_OBJ:.o=.cpp)
@@ -114,6 +116,7 @@ MKSTRIPES_LINK = $(CXX) \
 	-o $(BUILD_DIR)/mkstripes \
 	$(MKSTRIPES_OBJ) \
 	-L$(BUILD_DIR) \
+	-larmadillo \
 	-lboost_program_options \
 	-lpalette \
 	$(TOOLS_COMMON_OBJ)
@@ -141,6 +144,7 @@ MKWHEEL_LINK = $(CXX) \
 	-o $(BUILD_DIR)/mkwheel \
 	$(MKWHEEL_OBJ) \
 	-L$(BUILD_DIR) \
+	-larmadillo \
 	-lboost_program_options \
 	-lpalette \
 	$(TOOLS_COMMON_OBJ)
@@ -168,6 +172,7 @@ GETCOLORS_LINK = $(CXX) \
 	-o $(BUILD_DIR)/getcolors \
 	$(GETCOLORS_OBJ) \
 	-L$(BUILD_DIR) \
+	-larmadillo \
 	-lboost_program_options \
 	-lpalette \
 	 $(TOOLS_COMMON_OBJ)

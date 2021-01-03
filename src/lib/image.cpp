@@ -4,7 +4,9 @@
 #include <Magick++.h>
 
 #include "color.h"
+#include "color_k_means.h"
 #include "image.h"
+#include "image_get_sample_colors_mode.h"
 
 namespace palette {
 
@@ -52,5 +54,27 @@ std::vector<Color> Image::get_unique_colors() const {
         unique_colors.emplace_back(histogram_elem.first);
     }
     return unique_colors;
+}
+
+std::vector<Color> Image::get_sample_colors(
+    size_t num_colors, ImageGetSampleColorsMode mode, bool &success) const {
+    success = false;
+    std::vector<Color> sample_colors;
+    switch (mode.get_value()) {
+        case ImageGetSampleColorsMode::Value::quantize: {
+            Image quantized_image(image_);
+            quantized_image.get().quantizeColors(num_colors);
+            quantized_image.get().quantize();
+            sample_colors = quantized_image.get_unique_colors();
+            success = true;
+            break;
+        }
+        case ImageGetSampleColorsMode::Value::kmeans:
+            success = ColorKMeans::find_clusters(
+                num_colors, get_unique_colors(), sample_colors);
+            break;
+        default: break;
+    }
+    return sample_colors;
 }
 }  // namespace palette

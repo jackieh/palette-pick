@@ -38,20 +38,30 @@ for i in {1..8}; do
     end_time=`date +%s`
     printf " done in `expr $end_time - $start_time` seconds\n"
 
-    for d in {1..8}; do
-        printf "Creating stripes images for $n colors with tree depth $d..."
-        start_time=`date +%s`
+    printf "Creating stripes images for $n colors using kmeans..."
+    start_time=`date +%s`
+    stripes_file_name=$n-colors-stripes-kmeans-from-original.png
+    stripes_file_path=$output_directory_path/$stripes_file_name
+    ./build/getcolors -m kmeans -n $n -I $input_file_path \
+        | ./build/mkstripes -O $stripes_file_path
+    stripes_file_name=$n-colors-stripes-kmeans-from-posterized.png
+    stripes_file_path=$output_directory_path/$stripes_file_name
+    ./build/getcolors -m kmeans -n $n -I $posterize_file_path \
+        | ./build/mkstripes -O $stripes_file_path
+    end_time=`date +%s`
+    printf " done in `expr $end_time - $start_time` seconds\n"
 
+    for d in {1..8}; do
+        printf "Creating stripes images for $n colors using quantization with tree depth $d..."
+        start_time=`date +%s`
         stripes_file_name=$n-colors-stripes-quantized-from-original-tree-depth-$d.png
         stripes_file_path=$output_directory_path/$stripes_file_name
-        ./build/getcolors -n $n -d $d -I $input_file_path \
+        ./build/getcolors -m quantize -n $n -d $d -I $input_file_path \
             | ./build/mkstripes -O $stripes_file_path
-
         stripes_file_name=$n-colors-stripes-quantized-from-posterized-tree-depth-$d.png
         stripes_file_path=$output_directory_path/$stripes_file_name
-        ./build/getcolors -n $n -d $d -I $posterize_file_path \
+        ./build/getcolors -m quantize -n $n -d $d -I $posterize_file_path \
             | ./build/mkstripes -O $stripes_file_path
-
         end_time=`date +%s`
         printf " done in `expr $end_time - $start_time` seconds\n"
     done;

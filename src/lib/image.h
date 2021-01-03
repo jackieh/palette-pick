@@ -7,6 +7,7 @@
 namespace palette {
 
 class Color;
+class ImageGetSampleColorsMode;
 
 class Image {
  public:
@@ -23,6 +24,8 @@ class Image {
 
     std::vector<Color> get_colors() const;
     std::vector<Color> get_unique_colors() const;
+    std::vector<Color> get_sample_colors(
+        size_t num_colors, ImageGetSampleColorsMode mode, bool &success) const;
 
  private:
     Magick::Image image_;

@@ -56,16 +56,16 @@ Ideally some of the featues of this software will include things such as:
 
 ### Dependencies
 
-To build:
-
 - C++17
 
-- Boost
+- Boost ([project page](https://www.boost.org),
+  [source](https://github.com/boostorg))
 
-To run:
+- Armadillo ([project page](http://arma.sourceforge.net),
+  [source](https://gitlab.com/conradsnicta/armadillo-code))
 
 - ImageMagick ([project page](http://www.imagemagick.org),
-  [GitHub page](https://github.com/ImageMagick))
+  [source](https://github.com/ImageMagick))
 
 ### Building and testing
 

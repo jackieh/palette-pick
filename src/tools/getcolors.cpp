@@ -12,6 +12,7 @@
 #include "color.h"
 #include "color_vector.h"
 #include "image.h"
+#include "image_get_sample_colors_mode.h"
 
 namespace {
 
@@ -24,6 +25,7 @@ class GetColors : public Tool {
     GetColors() :
         help_(false),
         verbose_(false),
+        mode_(std::nullopt),
         max_num_colors_(std::nullopt),
         quantize_tree_depth_(std::nullopt),
         input_file_(std::nullopt),
@@ -62,6 +64,10 @@ class GetColors : public Tool {
         if (help_) {
             return exit_help();
         }
+        if (!mode_.has_value()) {
+            std::cerr << "Error: No mode specified" << std::endl;
+            return exit_more_information();
+        }
         if (!input_file_.has_value()) {
             std::cerr << "Error: No input file specified" << std::endl;
             return exit_more_information();
@@ -91,23 +97,25 @@ class GetColors : public Tool {
             std::cerr << error.what() << std::endl;
             return 1;
         }
-
-        // Reduce colors in image if needed.
-        size_t num_colors_original = image.get().totalColors();
         image.get().quantizeTreeDepth(quantize_tree_depth);
-        image.get().quantizeColors(*max_num_colors_);
-        image.get().quantize();
-        size_t num_colors_reduced = image.get().totalColors();
-        if (verbose_) {
-            std::cout << "Image " << input_file_.value() << " contains "
-                << std::to_string(num_colors_original) << " colors; reduced to "
-                << std::to_string(num_colors_reduced) << " colors" << std::endl;
+
+        palette::ImageGetSampleColorsMode mode(mode_.value());
+        if (!mode.valid()) {
+            std::cerr << "Unknown mode \"" << mode_.value() << "\""
+                << std::endl;
+            return 1;
         }
 
-        palette::ColorVector image_colors;
-        image_colors.get() = image.get_unique_colors();
-        std::sort(image_colors.get().begin(), image_colors.get().end());
-        std::cout << image_colors.to_string("\n") << std::endl;
+        bool get_sample_colors_success = false;
+        std::vector<palette::Color> sample_colors = image.get_sample_colors(
+            *max_num_colors_, mode, get_sample_colors_success);
+        if (!get_sample_colors_success) {
+            std::cerr << "Getting color subset failed" << std::endl;
+            return 1;
+        }
+        std::sort(sample_colors.begin(), sample_colors.end());
+        palette::ColorVector output_colors(std::move(sample_colors));
+        std::cout << output_colors.to_string("\n") << std::endl;
         return 0;
     }
 
@@ -143,6 +151,14 @@ class GetColors : public Tool {
         const char *help_chars = "Print this help message and exit";
         const char *verbose_chars = "Print extra information to stdout";
 
+        std::stringstream mode_stream;
+        mode_stream << "Method for getting colors ("
+            << "quantize" << ", "
+            << "kmeans" << ")";
+        std::string mode_string = mode_stream.str();
+        const char *mode_chars = mode_string.c_str();
+        const auto *mode_semantic(bpo::value<std::string>());
+
         std::stringstream number_stream;
         number_stream << "Specify maximum number of colors to list "
             "from the image";
@@ -168,6 +184,7 @@ class GetColors : public Tool {
         opt.add_options()
             ("help,h", help_chars)
             ("verbose,v", verbose_chars)
+            ("mode,m", mode_semantic, mode_chars)
             ("number,n", number_semantic, number_chars)
             ("depth,d", depth_semantic, depth_chars)
             ("input,I", input_semantic, input_chars);
@@ -184,6 +201,10 @@ class GetColors : public Tool {
     void set_options(bpo::variables_map var_map) {
         help_ |= !var_map["help"].empty();
         verbose_ |= !var_map["verbose"].empty();
+        if (!var_map["mode"].empty()) {
+            mode_ = std::optional<std::string>(
+                var_map["mode"].as<std::string>());
+        }
         if (!var_map["number"].empty()) {
             max_num_colors_ = std::optional<int>(var_map["number"].as<int>());
         }
@@ -199,6 +220,7 @@ class GetColors : public Tool {
 
     bool help_;
     bool verbose_;
+    std::optional<std::string> mode_;
     std::optional<int> max_num_colors_;
     std::optional<int> quantize_tree_depth_;
     std::optional<std::string> input_file_;
