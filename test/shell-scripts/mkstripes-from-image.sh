@@ -40,14 +40,34 @@ for i in {1..8}; do
 
     printf "Creating stripes images for $n colors using kmeans..."
     start_time=`date +%s`
-    stripes_file_name=$n-colors-stripes-original-kmeans.png
+
+    stripes_file_name=$n-colors-stripes-original-kmeans-random-spread.png
     stripes_file_path=$output_directory_path/$stripes_file_name
-    ./build/getcolors -m kmeans -n $n -I $input_file_path \
+    ./build/getcolors -m kmeans-random-spread -n $n -I $input_file_path \
         | ./build/mkstripes -O $stripes_file_path
-    stripes_file_name=$n-colors-stripes-posterized-kmeans.png
+    stripes_file_name=$n-colors-stripes-posterized-kmeans-random-spread.png
     stripes_file_path=$output_directory_path/$stripes_file_name
-    ./build/getcolors -m kmeans -n $n -I $posterized_file_path \
+    ./build/getcolors -m kmeans-random-spread -n $n -I $posterized_file_path \
         | ./build/mkstripes -O $stripes_file_path
+
+    stripes_file_name=$n-colors-stripes-original-kmeans-static-spread.png
+    stripes_file_path=$output_directory_path/$stripes_file_name
+    ./build/getcolors -m kmeans-static-spread -n $n -I $input_file_path \
+        | ./build/mkstripes -O $stripes_file_path
+    stripes_file_name=$n-colors-stripes-posterized-kmeans-static-spread.png
+    stripes_file_path=$output_directory_path/$stripes_file_name
+    ./build/getcolors -m kmeans-static-spread -n $n -I $posterized_file_path \
+        | ./build/mkstripes -O $stripes_file_path
+
+    stripes_file_name=$n-colors-stripes-original-kmeans-hue-spread.png
+    stripes_file_path=$output_directory_path/$stripes_file_name
+    ./build/getcolors -m kmeans-hue-spread -n $n -I $input_file_path \
+        | ./build/mkstripes -O $stripes_file_path
+    stripes_file_name=$n-colors-stripes-posterized-kmeans-hue-spread.png
+    stripes_file_path=$output_directory_path/$stripes_file_name
+    ./build/getcolors -m kmeans-hue-spread -n $n -I $posterized_file_path \
+        | ./build/mkstripes -O $stripes_file_path
+
     end_time=`date +%s`
     printf " done in `expr $end_time - $start_time` seconds\n"
 

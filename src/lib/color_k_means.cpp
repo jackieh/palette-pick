@@ -10,6 +10,7 @@
 namespace palette {
 
 bool ColorKMeans::find_clusters(size_t num_clusters,
+                                SeedMode seed_mode,
                                 const std::vector<Color> &colors,
                                 std::vector<Color> &color_centroids) {
     if (num_clusters >= colors.size()) {
@@ -20,6 +21,19 @@ bool ColorKMeans::find_clusters(size_t num_clusters,
     color_centroids.reserve(num_clusters);
 
     arma::mat means = arma::eye(3, num_clusters);
+    for (size_t c = 0; c < num_clusters; ++c) {
+        if (c < color_centroids.size()) {
+            const Color &color = color_centroids.at(c);
+            means(0, c) = static_cast<int>(color.get().quantumRed());
+            means(1, c) = static_cast<int>(color.get().quantumGreen());
+            means(2, c) = static_cast<int>(color.get().quantumBlue());
+        } else {
+            means(0, c) = 0;
+            means(1, c) = 0;
+            means(2, c) = 0;
+        }
+    }
+
     arma::mat data = arma::eye(3, colors.size());
     for (size_t c = 0; c < colors.size(); ++c) {
         const Color &color = colors.at(c);
@@ -28,9 +42,25 @@ bool ColorKMeans::find_clusters(size_t num_clusters,
         data(2, c) = static_cast<int>(color.get().quantumBlue());
     }
 
-    const bool k_means_success = arma::kmeans(
-        means, data, num_clusters, arma::static_spread,
-        /* num iterations */ 10, /* print mode */ false);
+    bool k_means_success = false;
+    switch (seed_mode) {
+        case SeedMode::keep_existing:
+            k_means_success = arma::kmeans(
+                means, data, num_clusters, arma::keep_existing,
+                /* num iterations */ 10, /* print mode */ false);
+            break;
+        case SeedMode::random_spread:
+            k_means_success = arma::kmeans(
+                means, data, num_clusters, arma::random_spread,
+                /* num iterations */ 10, /* print mode */ false);
+            break;
+        case SeedMode::static_spread:
+            k_means_success = arma::kmeans(
+                means, data, num_clusters, arma::static_spread,
+                /* num iterations */ 10, /* print mode */ false);
+            break;
+        default: break;
+    }
     for (size_t c = 0; c < num_clusters; ++c) {
         Magick::Quantum quantumRed =
             static_cast<Magick::Quantum>(means(0, c));

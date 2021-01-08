@@ -38,16 +38,28 @@ ImageGetSampleColorsMode::Value ImageGetSampleColorsMode::value_from_string(
     if (value_str.compare(value_to_string(Value::quantize)) == 0) {
         return Value::quantize;
     }
-    if (value_str.compare(value_to_string(Value::kmeans)) == 0) {
-        return Value::kmeans;
+    if (value_str.compare(value_to_string(Value::kmeans_random_spread)) == 0) {
+        return Value::kmeans_random_spread;
+    }
+    if (value_str.compare(value_to_string(Value::kmeans_static_spread)) == 0) {
+        return Value::kmeans_static_spread;
+    }
+    if (value_str.compare(value_to_string(Value::kmeans_hue_spread)) == 0) {
+        return Value::kmeans_hue_spread;
     }
     return Value::unknown;
 }
 
 std::string ImageGetSampleColorsMode::value_to_string(const Value value) {
     switch (value) {
-        case ImageGetSampleColorsMode::Value::quantize: return "quantize";
-        case ImageGetSampleColorsMode::Value::kmeans: return "kmeans";
+        case Value::quantize:
+            return "quantize";
+        case Value::kmeans_random_spread:
+            return "kmeans-random-spread";
+        case Value::kmeans_static_spread:
+            return "kmeans-static-spread";
+        case Value::kmeans_hue_spread:
+            return "kmeans-hue-spread";
         default: break;
     }
     return "unknown";

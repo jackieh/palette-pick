@@ -154,7 +154,9 @@ class GetColors : public Tool {
         std::stringstream mode_stream;
         mode_stream << "Method for getting colors ("
             << "quantize" << ", "
-            << "kmeans" << ")";
+            << "kmeans-random-spread" << ", "
+            << "kmeans-static-spread" << ", "
+            << "kmeans-hue-spread" << ")";
         std::string mode_string = mode_stream.str();
         const char *mode_chars = mode_string.c_str();
         const auto *mode_semantic(bpo::value<std::string>());

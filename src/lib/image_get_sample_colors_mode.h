@@ -8,7 +8,9 @@ class ImageGetSampleColorsMode {
  public:
     enum class Value {
         quantize,
-        kmeans,
+        kmeans_random_spread,
+        kmeans_static_spread,
+        kmeans_hue_spread,
         unknown
     };
 

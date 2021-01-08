@@ -9,6 +9,10 @@
 #include "image_get_sample_colors_mode.h"
 
 namespace palette {
+namespace {
+
+std::vector<Color> get_hue_spread_colors(int num_colors);
+}  // namespace
 
 Image::Image() : image_() { }
 
@@ -69,12 +73,42 @@ std::vector<Color> Image::get_sample_colors(
             success = true;
             break;
         }
-        case ImageGetSampleColorsMode::Value::kmeans:
+        case ImageGetSampleColorsMode::Value::kmeans_random_spread:
             success = ColorKMeans::find_clusters(
-                num_colors, get_unique_colors(), sample_colors);
+                num_colors, ColorKMeans::SeedMode::random_spread,
+                get_unique_colors(), sample_colors);
+            break;
+        case ImageGetSampleColorsMode::Value::kmeans_static_spread:
+            success = ColorKMeans::find_clusters(
+                num_colors, ColorKMeans::SeedMode::static_spread,
+                get_unique_colors(), sample_colors);
+            break;
+        case ImageGetSampleColorsMode::Value::kmeans_hue_spread:
+            sample_colors = get_hue_spread_colors(num_colors);
+            success = ColorKMeans::find_clusters(
+                num_colors, ColorKMeans::SeedMode::keep_existing,
+                get_unique_colors(), sample_colors);
             break;
         default: break;
     }
     return sample_colors;
 }
+
+namespace {
+
+std::vector<Color> get_hue_spread_colors(int num_colors) {
+    std::vector<Color> hue_spread_colors;
+    hue_spread_colors.reserve(num_colors);
+    double hue_increment = (1.0 / num_colors);
+    for (int i = 0; i < num_colors; ++i) {
+        double hue_value = hue_increment * i;
+        Magick::ColorHSL hue_spread_color(
+            static_cast<Magick::Quantum>(hue_value),
+            static_cast<Magick::Quantum>(1.0),
+            static_cast<Magick::Quantum>(0.5));
+        hue_spread_colors.emplace_back(Magick::Color(hue_spread_color));
+    }
+    return hue_spread_colors;
+}
+}  // namespace
 }  // namespace palette
