@@ -47,6 +47,14 @@ ImageGetSampleColorsMode::Value ImageGetSampleColorsMode::value_from_string(
     if (value_str.compare(value_to_string(Value::kmeans_hue_spread)) == 0) {
         return Value::kmeans_hue_spread;
     }
+    if (value_str.compare(value_to_string(
+                Value::kmeans_bright_hue_spread)) == 0) {
+        return Value::kmeans_bright_hue_spread;
+    }
+    if (value_str.compare(value_to_string(
+                Value::kmeans_saturated_hue_spread)) == 0) {
+        return Value::kmeans_saturated_hue_spread;
+    }
     return Value::unknown;
 }
 
@@ -60,6 +68,10 @@ std::string ImageGetSampleColorsMode::value_to_string(const Value value) {
             return "kmeans-static-spread";
         case Value::kmeans_hue_spread:
             return "kmeans-hue-spread";
+        case Value::kmeans_bright_hue_spread:
+            return "kmeans-bright-hue-spread";
+        case Value::kmeans_saturated_hue_spread:
+            return "kmeans-saturated-hue-spread";
         default: break;
     }
     return "unknown";

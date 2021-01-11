@@ -11,6 +11,8 @@ class ImageGetSampleColorsMode {
         kmeans_random_spread,
         kmeans_static_spread,
         kmeans_hue_spread,
+        kmeans_bright_hue_spread,
+        kmeans_saturated_hue_spread,
         unknown
     };
 

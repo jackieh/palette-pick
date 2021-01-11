@@ -156,7 +156,9 @@ class GetColors : public Tool {
             << "quantize" << ", "
             << "kmeans-random-spread" << ", "
             << "kmeans-static-spread" << ", "
-            << "kmeans-hue-spread" << ")";
+            << "kmeans-hue-spread" << ", "
+            << "kmeans-bright-hue-spread" << ", "
+            << "kmeans-saturated-hue-spread" << ")";
         std::string mode_string = mode_stream.str();
         const char *mode_chars = mode_string.c_str();
         const auto *mode_semantic(bpo::value<std::string>());

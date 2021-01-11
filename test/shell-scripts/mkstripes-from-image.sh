@@ -68,6 +68,24 @@ for i in {1..8}; do
     ./build/getcolors -m kmeans-hue-spread -n $n -I $posterized_file_path \
         | ./build/mkstripes -O $stripes_file_path
 
+    stripes_file_name=$n-colors-stripes-original-kmeans-bright-hue-spread.png
+    stripes_file_path=$output_directory_path/$stripes_file_name
+    ./build/getcolors -m kmeans-bright-hue-spread -n $n -I $input_file_path \
+        | ./build/mkstripes -O $stripes_file_path
+    stripes_file_name=$n-colors-stripes-posterized-kmeans-bright-hue-spread.png
+    stripes_file_path=$output_directory_path/$stripes_file_name
+    ./build/getcolors -m kmeans-bright-hue-spread -n $n -I $posterized_file_path \
+        | ./build/mkstripes -O $stripes_file_path
+
+    stripes_file_name=$n-colors-stripes-original-kmeans-saturated-hue-spread.png
+    stripes_file_path=$output_directory_path/$stripes_file_name
+    ./build/getcolors -m kmeans-saturated-hue-spread -n $n -I $input_file_path \
+        | ./build/mkstripes -O $stripes_file_path
+    stripes_file_name=$n-colors-stripes-posterized-kmeans-saturated-hue-spread.png
+    stripes_file_path=$output_directory_path/$stripes_file_name
+    ./build/getcolors -m kmeans-saturated-hue-spread -n $n -I $posterized_file_path \
+        | ./build/mkstripes -O $stripes_file_path
+
     end_time=`date +%s`
     printf " done in `expr $end_time - $start_time` seconds\n"
 
