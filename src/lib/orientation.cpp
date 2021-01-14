@@ -1,6 +1,6 @@
-#include <string>
+#include "lib/orientation.h"
 
-#include "orientation.h"
+#include <string>
 
 namespace palette {
 

@@ -1,9 +1,9 @@
+#include "tools/tools_common.h"
+
 #include <iostream>
 #include <string>
 
 #include <boost/program_options.hpp>
-
-#include "tools_common.h"
 
 // Bare minimum functionality. Ideally the derived class redefines this
 // function to do more specific things with specific errors.

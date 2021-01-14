@@ -1,11 +1,11 @@
+#include "lib/color.h"
+
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include <utility>
 
 #include <Magick++.h>
-
-#include "color.h"
 
 namespace palette {
 

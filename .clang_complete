@@ -1,5 +1,4 @@
--I./src/lib/
--I./src/tools/
+-I./src/
 -I/usr/include/
 -I/usr/include/ImageMagick-7/
 -DMAGICKCORE_QUANTUM_DEPTH=8

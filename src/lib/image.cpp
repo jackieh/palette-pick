@@ -1,13 +1,14 @@
+#include "lib/image.h"
+
 #include <algorithm>
 #include <utility>
 #include <vector>
 
 #include <Magick++.h>
 
-#include "color.h"
-#include "color_k_means.h"
-#include "image.h"
-#include "image_get_sample_colors_mode.h"
+#include "lib/color.h"
+#include "lib/color_k_means.h"
+#include "lib/image_get_sample_colors_mode.h"
 
 namespace palette {
 namespace {

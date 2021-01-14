@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <iostream>
 #include <optional>
 #include <sstream>
@@ -6,12 +5,14 @@
 #include <vector>
 
 #include <boost/program_options.hpp>
+
 #include <Magick++.h>
 
-#include "tools_common.h"
-#include "color.h"
-#include "orientation.h"
-#include "stripes_image.h"
+#include "lib/color.h"
+#include "lib/orientation.h"
+#include "lib/stripes_image.h"
+
+#include "tools/tools_common.h"
 
 namespace {
 

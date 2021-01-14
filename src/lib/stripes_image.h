@@ -3,8 +3,8 @@
 #include <sstream>
 #include <string>
 
-#include "color_vector.h"
-#include "orientation.h"
+#include "lib/color_vector.h"
+#include "lib/orientation.h"
 
 namespace palette {
 

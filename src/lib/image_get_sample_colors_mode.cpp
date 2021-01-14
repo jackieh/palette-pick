@@ -1,6 +1,6 @@
-#include <string>
+#include "lib/image_get_sample_colors_mode.h"
 
-#include "image_get_sample_colors_mode.h"
+#include <string>
 
 namespace palette {
 

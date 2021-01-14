@@ -1,18 +1,19 @@
 #include <algorithm>
-#include <iomanip>
 #include <iostream>
 #include <optional>
 #include <string>
 #include <vector>
 
 #include <boost/program_options.hpp>
+
 #include <Magick++.h>
 
-#include "tools_common.h"
-#include "color.h"
-#include "color_vector.h"
-#include "image.h"
-#include "image_get_sample_colors_mode.h"
+#include "lib/color.h"
+#include "lib/color_vector.h"
+#include "lib/image.h"
+#include "lib/image_get_sample_colors_mode.h"
+
+#include "tools/tools_common.h"
 
 namespace {
 

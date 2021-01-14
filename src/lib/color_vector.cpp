@@ -1,11 +1,12 @@
+#include "lib/color_vector.h"
+
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <utility>
 
-#include "color.h"
-#include "color_vector.h"
+#include "lib/color.h"
 
 namespace palette {
 

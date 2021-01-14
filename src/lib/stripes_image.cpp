@@ -1,12 +1,13 @@
+#include "lib/stripes_image.h"
+
 #include <sstream>
 #include <string>
 
 #include <Magick++.h>
 
-#include "color.h"
-#include "color_vector.h"
-#include "orientation.h"
-#include "stripes_image.h"
+#include "lib/color.h"
+#include "lib/color_vector.h"
+#include "lib/orientation.h"
 
 namespace palette {
 

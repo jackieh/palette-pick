@@ -1,11 +1,12 @@
+#include "lib/color_k_means.h"
+
 #include <vector>
 
 #include <armadillo>
 
 #include <Magick++.h>
 
-#include "color.h"
-#include "color_k_means.h"
+#include "lib/color.h"
 
 namespace palette {
 

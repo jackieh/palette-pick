@@ -1,11 +1,12 @@
+#include "lib/color_set.h"
+
 #include <iomanip>
 #include <set>
 #include <sstream>
 #include <string>
 #include <utility>
 
-#include "color.h"
-#include "color_set.h"
+#include "lib/color.h"
 
 namespace palette {
 

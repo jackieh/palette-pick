@@ -36,7 +36,7 @@ clean:
 .PHONY: lint
 lint:
 	cpplint \
-		--filter=-build/c++11,-build/include_subdir,-legal/copyright,-readability/todo,-runtime/references \
+		--filter=-build/c++11,-build/include_order,-legal/copyright,-readability/todo,-runtime/references \
 		--recursive \
 		--extensions=h,cpp \
 		$(SRC_DIR)
@@ -61,7 +61,7 @@ LIB_OBJ = \
 	$(LIB_DIR)/orientation.o \
 	$(LIB_DIR)/stripes_image.o
 LIB_SRC = $(LIB_OBJ:.o=.cpp)
-$(LIB_DIR)/%.o: BUILD_FLAGS := -I$(LIB_DIR) $(MAGICK_FLAGS)
+$(LIB_DIR)/%.o: BUILD_FLAGS := -I$(SRC_DIR) $(MAGICK_FLAGS)
 LIB_OUT = $(BUILD_DIR)/libpalette.a
 $(LIB_OUT): $(LIB_OBJ)
 	mkdir -p $(BUILD_DIR)
@@ -94,19 +94,18 @@ lib: $(LIB_OUT)
 TOOLS_COMMON_SRC = $(TOOLS_DIR)/tools_common.cpp
 TOOLS_COMMON_OBJ = $(TOOLS_DIR)/tools_common.o
 
-TOOLS_COMMON_BUILD = $(CXX) -I$(TOOLS_DIR) \
+TOOLS_COMMON_BUILD = $(CXX) -I$(SRC_DIR) \
 	-o $(TOOLS_COMMON_OBJ) \
 	-c $(TOOLS_COMMON_SRC)
 
-$(TOOLS_COMMON_OBJ): BUILD_FLAGS := -I$(TOOLS_DIR)
+$(TOOLS_COMMON_OBJ): BUILD_FLAGS := -I$(SRC_DIR)
 
 MKSTRIPES_SRC = $(TOOLS_DIR)/mkstripes.cpp
 MKSTRIPES_OBJ = $(TOOLS_DIR)/mkstripes.o
 
 MKSTRIPES_BUILD = $(CXX) \
 	$(MAGICK_FLAGS) \
-	-I$(LIB_DIR) \
-	-I$(TOOLS_DIR) \
+	-I$(SRC_DIR) \
 	-DEXEC_NAME=\"mkstripes\" \
 	-o $(MKSTRIPES_OBJ) \
 	-c $(MKSTRIPES_SRC)
@@ -133,8 +132,7 @@ MKWHEEL_OBJ = $(TOOLS_DIR)/mkwheel.o
 
 MKWHEEL_BUILD = $(CXX) \
 	$(MAGICK_FLAGS) \
-	-I$(LIB_DIR) \
-	-I$(TOOLS_DIR) \
+	-I$(SRC_DIR) \
 	-DEXEC_NAME=\"mkwheel\" \
 	-o $(MKWHEEL_OBJ) \
 	-c $(MKWHEEL_SRC)
@@ -161,8 +159,7 @@ GETCOLORS_OBJ = $(TOOLS_DIR)/getcolors.o
 
 GETCOLORS_BUILD = $(CXX) \
 	$(MAGICK_FLAGS) \
-	-I $(LIB_DIR) \
-	-I $(TOOLS_DIR) \
+	-I $(SRC_DIR) \
 	-DEXEC_NAME=\"getcolors\" \
 	-o $(GETCOLORS_OBJ) \
 	-c $(GETCOLORS_SRC)
