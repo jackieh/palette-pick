@@ -2,7 +2,7 @@
 
 input_file_path=$1
 
-if [ -z $input_file_path ]
+if [[ -z $input_file_path ]]
 then
     echo "No input file specified"
     exit 1
