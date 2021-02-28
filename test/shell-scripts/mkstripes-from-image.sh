@@ -2,6 +2,7 @@
 
 input_file_path="$1"
 TIMEFORMAT=" done in %lR"
+BIN=$(dirname "$0")/../../build
 
 if [[ -z "$input_file_path" ]]
 then
@@ -37,48 +38,48 @@ for i in {1..8}; do
     time {
 	stripes_file_name=$n-colors-stripes-original-kmeans-random-spread.png
 	stripes_file_path="$output_directory_path"/"$stripes_file_name"
-	./build/getcolors -m kmeans-random-spread -n $n -I "$input_file_path" \
-            | ./build/mkstripes -O "$stripes_file_path"
+	"$BIN"/getcolors -m kmeans-random-spread -n $n -I "$input_file_path" \
+            | "$BIN"/mkstripes -O "$stripes_file_path"
 	stripes_file_name=$n-colors-stripes-posterized-kmeans-random-spread.png
 	stripes_file_path="$output_directory_path"/"$stripes_file_name"
-	./build/getcolors -m kmeans-random-spread -n $n -I "$posterized_file_path" \
-            | ./build/mkstripes -O "$stripes_file_path"
+	"$BIN"/getcolors -m kmeans-random-spread -n $n -I "$posterized_file_path" \
+            | "$BIN"/mkstripes -O "$stripes_file_path"
 
 	stripes_file_name=$n-colors-stripes-original-kmeans-static-spread.png
 	stripes_file_path="$output_directory_path"/"$stripes_file_name"
-	./build/getcolors -m kmeans-static-spread -n $n -I "$input_file_path" \
-            | ./build/mkstripes -O "$stripes_file_path"
+	"$BIN"/getcolors -m kmeans-static-spread -n $n -I "$input_file_path" \
+            | "$BIN"/mkstripes -O "$stripes_file_path"
 	stripes_file_name=$n-colors-stripes-posterized-kmeans-static-spread.png
 	stripes_file_path="$output_directory_path"/"$stripes_file_name"
-	./build/getcolors -m kmeans-static-spread -n $n -I "$posterized_file_path" \
-            | ./build/mkstripes -O "$stripes_file_path"
+	"$BIN"/getcolors -m kmeans-static-spread -n $n -I "$posterized_file_path" \
+            | "$BIN"/mkstripes -O "$stripes_file_path"
 
 	stripes_file_name=$n-colors-stripes-original-kmeans-hue-spread.png
 	stripes_file_path="$output_directory_path"/"$stripes_file_name"
-	./build/getcolors -m kmeans-hue-spread -n $n -I "$input_file_path" \
-            | ./build/mkstripes -O "$stripes_file_path"
+	"$BIN"/getcolors -m kmeans-hue-spread -n $n -I "$input_file_path" \
+            | "$BIN"/mkstripes -O "$stripes_file_path"
 	stripes_file_name=$n-colors-stripes-posterized-kmeans-hue-spread.png
 	stripes_file_path="$output_directory_path"/"$stripes_file_name"
-	./build/getcolors -m kmeans-hue-spread -n $n -I "$posterized_file_path" \
-            | ./build/mkstripes -O "$stripes_file_path"
+	"$BIN"/getcolors -m kmeans-hue-spread -n $n -I "$posterized_file_path" \
+            | "$BIN"/mkstripes -O "$stripes_file_path"
 
 	stripes_file_name=$n-colors-stripes-original-kmeans-bright-hue-spread.png
 	stripes_file_path="$output_directory_path"/"$stripes_file_name"
-	./build/getcolors -m kmeans-bright-hue-spread -n $n -I "$input_file_path" \
-            | ./build/mkstripes -O "$stripes_file_path"
+	"$BIN"/getcolors -m kmeans-bright-hue-spread -n $n -I "$input_file_path" \
+            | "$BIN"/mkstripes -O "$stripes_file_path"
 	stripes_file_name=$n-colors-stripes-posterized-kmeans-bright-hue-spread.png
 	stripes_file_path="$output_directory_path"/"$stripes_file_name"
-	./build/getcolors -m kmeans-bright-hue-spread -n $n -I "$posterized_file_path" \
-            | ./build/mkstripes -O "$stripes_file_path"
+	"$BIN"/getcolors -m kmeans-bright-hue-spread -n $n -I "$posterized_file_path" \
+            | "$BIN"/mkstripes -O "$stripes_file_path"
 
 	stripes_file_name=$n-colors-stripes-original-kmeans-saturated-hue-spread.png
 	stripes_file_path="$output_directory_path"/"$stripes_file_name"
-	./build/getcolors -m kmeans-saturated-hue-spread -n $n -I "$input_file_path" \
-            | ./build/mkstripes -O "$stripes_file_path"
+	"$BIN"/getcolors -m kmeans-saturated-hue-spread -n $n -I "$input_file_path" \
+            | "$BIN"/mkstripes -O "$stripes_file_path"
 	stripes_file_name=$n-colors-stripes-posterized-kmeans-saturated-hue-spread.png
 	stripes_file_path="$output_directory_path"/"$stripes_file_name"
-	./build/getcolors -m kmeans-saturated-hue-spread -n $n -I "$posterized_file_path" \
-            | ./build/mkstripes -O "$stripes_file_path"
+	"$BIN"/getcolors -m kmeans-saturated-hue-spread -n $n -I "$posterized_file_path" \
+            | "$BIN"/mkstripes -O "$stripes_file_path"
     }
 
     for d in {1..4}; do
@@ -86,12 +87,12 @@ for i in {1..8}; do
 	time {
             stripes_file_name=$n-colors-stripes-original-quantized-tree-depth-$d.png
             stripes_file_path="$output_directory_path"/"$stripes_file_name"
-            ./build/getcolors -m quantize -n $n -d $d -I "$input_file_path" \
-		| ./build/mkstripes -O "$stripes_file_path"
+            "$BIN"/getcolors -m quantize -n $n -d $d -I "$input_file_path" \
+		| "$BIN"/mkstripes -O "$stripes_file_path"
             stripes_file_name=$n-colors-stripes-posterized-quantized-tree-depth-$d.png
             stripes_file_path="$output_directory_path"/"$stripes_file_name"
-            ./build/getcolors -m quantize -n $n -d $d -I "$posterized_file_path" \
-		| ./build/mkstripes -O "$stripes_file_path"
+            "$BIN"/getcolors -m quantize -n $n -d $d -I "$posterized_file_path" \
+		| "$BIN"/mkstripes -O "$stripes_file_path"
 	}
     done;
 done
